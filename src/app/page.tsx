@@ -165,7 +165,9 @@ export default function Dashboard() {
     }
 
     // 2. Cargar Lista de Avatares (Multi-Avatar)
+    const savedAvatarsList = localStorage.getItem("ugc_multi_avatars_list");
     let migratedAvatars: AvatarIdentity[] = [];
+    let initialAvatars: AvatarIdentity[] = [];
     if (savedAvatarsList) {
       try { 
         initialAvatars = JSON.parse(savedAvatarsList); 
