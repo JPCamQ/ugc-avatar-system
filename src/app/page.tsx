@@ -2163,7 +2163,7 @@ export default function Dashboard() {
             &copy; {new Date().getFullYear()} UGC Avatar Studio. Desarrollado en Modo Claro Premium.
           </div>
           <div className="flex gap-4 font-semibold text-slate-400">
-            <span>Proyecto: Ecosistema Valeria Cruz & Clientes</span>
+            <span>Proyecto: Ecosistema Milena Basset & Clientes</span>
             <span>|</span>
             <span>Flow-Optimized API</span>
           </div>
@@ -2204,7 +2204,7 @@ export default function Dashboard() {
                     type="text"
                     value={newAvatarForm.name}
                     onChange={(e) => setNewAvatarForm({ ...newAvatarForm, name: e.target.value })}
-                    placeholder="Ej. Valeria Cruz"
+                    placeholder="Ej. Milena Basset"
                     className="w-full bg-slate-50 border border-slate-100 rounded-xl px-3.5 py-2 text-xs text-slate-800 focus:outline-none"
                   />
                 </div>
