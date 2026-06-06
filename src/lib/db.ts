@@ -23,7 +23,7 @@ export interface PostIdea {
   id: string;
   avatarId: string; // Clave foránea para asociar al avatar correspondiente
   title: string;
-  type: "image" | "carousel" | "video";
+  type: "image" | "carousel" | "video" | "flyer";
   location: string;
   phase: GrowthPhase; // Fase a la que pertenece esta publicación
   scenePrompt: string;
@@ -52,19 +52,19 @@ export interface ChatSimulation {
   notes?: string;
 }
 
-// Configuración inicial del primer avatar: Valeria Cruz
+// Configuración inicial del primer avatar: Milena Basset
 export const DEFAULT_AVATAR: AvatarIdentity = {
-  id: "valeria_cruz",
-  name: "Valeria Cruz",
+  id: "valeria_cruz", // Mantenemos el ID para no romper la compatibilidad con localStorage existente
+  name: "Milena Basset",
   age: 28,
-  niche: "Lifestyle Financiero & Viajes Sola",
+  niche: "Lifestyle de Lujo, Fitness & Marca Personal de Éxito",
   location: "Medellín, Colombia (actualmente viajando)",
-  backstory: "Nacida en Bogotá. A los 25 años estaba sumida en deudas trabajando 10 horas al día en un cubículo de oficina. Decidió aprender sobre finanzas personales, inversiones digitales y marketing de afiliados. Hoy, a sus 28, es financieramente libre, viaja sola documentando su camino y enseña a otros hispanos a construir riqueza desde cero a través de herramientas fintech y marca personal vendible.",
-  monetizationLink: "https://fintech-afiliado.com/valeria-cruz",
+  backstory: "Nacida en Bogotá. A sus 28 años, es una mujer independiente y de negocios exitosa que recorre el mundo compartiendo su estilo de vida cosmopolita e internacional. Le apasiona el fitness, la moda, la buena gastronomía y las cenas de gala. Documenta su intensa vida social, que incluye rutinas de gimnasio, mercados exóticos, eventos de networking de alta gama y noches de fiesta exclusivas, inspirando a su comunidad a alcanzar libertad financiera e internacional con una actitud sumamente ganadora, positiva y magnética.",
+  monetizationLink: "https://fintech-afiliado.com/milena-basset",
   monetizationProduct: "Registro en plataforma Fintech (Cupo de Inversión + Bono de $20 USD)",
-  toneOfVoice: "Cercana, ultra natural, espontánea, coloquial y millennial. No suena a profesora de finanzas; habla como una amiga de confianza que te cuenta un truco sobre cómo viaja de forma inteligente. Usa emojis de forma sutil, responde de forma relajada e informal pero con convicción y transparencia.",
-  language: "Español Latinoamericano",
-  characterDna: "Photorealistic photograph of a 28-year-old Latina woman with European features and red hair.",
-  audioSettings: "ACCENT: Warm and friendly neutral Latin American Spanish, conversational and modern diction.\nPAUSES: Relaxed and expressive rhythm, breathing naturally.\nMICROPHONE: Simulate high-quality smartphone vocal note (vibrant, close, authentic, like a WhatsApp audio or TikTok voiceover).\nSPEED: Dynamic, engaging, and slightly fast, expressing enthusiasm.",
-  videoSettings: "EYE CONTACT: Direct but playful and relaxed eye contact with the camera, resembling a smartphone selfie video.\nMICRO-EXPRESSIONS: Smiling, warm expressions, organic winks, natural laughter.\nGESTURES: Dynamic hand movements, casual postures, showing details around her environment naturally."
+  toneOfVoice: "Juvenil, enérgica, sofisticada pero sumamente cercana, coqueta y coloquial. Habla como una influencer de moda y lifestyle segura de sí misma. Usa emojis con elegancia y alterna palabras en inglés y español de forma natural. Transmite positivismo, abundancia y libertad.",
+  language: "Español con toques bilingües",
+  characterDna: "Photorealistic photograph of a 28-year-old Latina woman with European features, natural red hair, athletic and elegant physique, high fashion style.",
+  audioSettings: "ACCENT: Native Spanish speaker with a clear and natural Venezuelan accent. Zero foreign accent. Authentic Venezuelan pronunciation.\nPAUSES: Natural rhythm and breathing spaces.\nMICROPHONE: High-quality smartphone vocal note (vibrant, close, authentic, like a WhatsApp audio or TikTok voiceover).\nSPEED: Dynamic, engaging, and slightly fast, expressing enthusiasm.",
+  videoSettings: "EYE CONTACT: Direct and relaxed eye contact with the camera.\nTEXT: Absolutely no text, labels, subtitles, metadata, or titles overlaid on the screen at any point.\nGESTURES: Dynamic hand movements, casual postures, showing details around her environment naturally."
 };

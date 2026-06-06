@@ -4,7 +4,7 @@ import { AvatarIdentity } from "@/lib/db";
 
 export async function POST(request: Request) {
   try {
-    const { avatar, phase, apiKey } = await request.json();
+    const { avatar, phase, apiKey, customContext } = await request.json();
 
     if (!avatar || !phase || !apiKey) {
       return NextResponse.json(
@@ -13,7 +13,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const ideas = await generatePostIdeas(avatar as AvatarIdentity, phase, apiKey);
+    const ideas = await generatePostIdeas(avatar as AvatarIdentity, phase, apiKey, customContext);
     return NextResponse.json({ ideas });
   } catch (error: any) {
     console.error("Error in /api/ideas:", error);

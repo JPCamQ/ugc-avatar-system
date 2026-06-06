@@ -4,7 +4,7 @@ import { AvatarIdentity, PostIdea } from "@/lib/db";
 
 export async function POST(request: Request) {
   try {
-    const { avatar, idea, apiKey } = await request.json();
+    const { avatar, idea, apiKey, audioLanguage } = await request.json();
 
     if (!avatar || !idea || !apiKey) {
       return NextResponse.json(
@@ -16,7 +16,8 @@ export async function POST(request: Request) {
     const flowPrompt = await generatePromptForFlow(
       avatar as AvatarIdentity,
       idea as PostIdea,
-      apiKey
+      apiKey,
+      audioLanguage
     );
     return NextResponse.json({ flowPrompt });
   } catch (error: any) {

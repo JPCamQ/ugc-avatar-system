@@ -47,21 +47,29 @@ async function callDeepSeek(
 export async function generatePostIdeas(
   avatar: AvatarIdentity,
   phase: GrowthPhase,
-  apiKey: string
-): Promise<Array<{ title: string; type: "image" | "video"; location: string; description: string }>> {
+  apiKey: string,
+  customContext?: string
+): Promise<Array<{ title: string; type: "image" | "carousel" | "video" | "flyer"; location: string; description: string }>> {
   
   let phaseGuidelines = "";
   if (phase === "storytelling") {
     phaseGuidelines = `FASE 1: CONEXIÓN & STORYTELLING BIOGRÁFICO.
-El objetivo es humanizar al avatar. Crea ideas que revelen su pasado en un cubículo de oficina en Bogotá, sus miedos iniciales al viajar sola, y los motivos de su transformación financiera.
-REGLA CRÍTICA: Prohibido sugerir u ofrecer herramientas de monetización, links de afiliado o vender nada. Debe sentirse como una bitácora personal, emocional y honesta.`;
+El objetivo es humanizar al avatar. Crea ideas enfocadas en su presente exitoso, libre y dinámico, mostrando su día a día (rutinas de gimnasio exigentes, paseos en mercados locales exclusivos, eventos de networking o preparando su día de trabajo).
+REGLA CRÍTICA: Prohibido sugerir u ofrecer herramientas de monetización directa en el copy de la idea. Debe sentirse como una bitácora de su libertad, bienestar y éxito personal. Evitar lamentos o historias tristes de oficina; enfocarse en el presente de abundancia.`;
   } else if (phase === "value") {
     phaseGuidelines = `FASE 2: VALOR PRÁCTICO & AUTORIDAD.
-El objetivo es educar y aportar valor real de finanzas y lifestyle. Crea ideas sobre consejos prácticos de ahorro para viajes, herramientas fintech que ella usa en su día a día de forma informal, o mentalidad de riqueza.
+El objetivo es educar y aportar valor de finanzas y lifestyle de forma casual. Crea ideas sobre hábitos de consumo inteligente mientras viaja, cómo invierte en su bienestar (membresía de gym, cenas de lujo o ropa de alta calidad) y mentalidad de riqueza.
 REGLA CRÍTICA: No ofrecer enlaces de venta ni pedir registros. La interacción debe ser consultiva, aportando valor gratuito sin ganchos comerciales directos.`;
   } else {
     phaseGuidelines = `FASE 3: CONVERSIÓN ACTIVA & MONETIZACIÓN.
-El objetivo es vender y derivar tráfico al producto fintech. Crea ideas con llamados a la acción potentes. Ejemplos: "Comenta la palabra X abajo y mi bot te enviará un DM con la app que utilizo para generar rendimientos con un bono de $20 USD".`;
+El objetivo es vender y derivar tráfico. Crea ideas con llamados a la acción potentes integrados en su estilo de vida social (ej. mostrando su smartphone en una cena o antes de ir de fiesta). Ejemplos: "Comenta la palabra X abajo y mi bot te enviará un DM con la app que utilizo para generar rendimientos con un bono de $20 USD".`;
+  }
+
+  let customContextInstruction = "";
+  if (customContext && customContext.trim()) {
+    customContextInstruction = `CONTEXTO/TEMÁTICA SOLICITADA POR EL USUARIO:
+El usuario ha solicitado explícitamente que los posts tengan la siguiente temática o contexto: "${customContext}".
+Por lo tanto, debes ambientar, localizar y enfocar las 5 ideas de publicaciones obligatoriamente en este contexto, adaptándolas coherentemente a la Fase de Contenido (${phase.toUpperCase()}).`;
   }
 
   const systemPrompt = `Eres un estratega de contenido y director creativo para un influencer de Inteligencia Artificial (Avatar UGC).
@@ -77,12 +85,18 @@ Tu avatar tiene esta identidad:
 Debes generar 5 ideas de publicaciones para su feed/Reels de Instagram en formato JSON adaptadas a la siguiente fase de contenido:
 ${phaseGuidelines}
 
+${customContextInstruction}
+
+CRÍTICO:
+- La vida de Milena es sumamente activa y cosmopolita. Las ideas deben situarse en locaciones como: gimnasios boutique, terrazas de restaurantes de lujo, cenas elegantes, mercados locales exóticos, paseos por ciudades icónicas, estadios, eventos de moda o sesiones de modelaje.
+- Provee una mezcla variada de tipos de publicación: "image" (foto individual), "carousel" (carrusel), "video" (Reel/Video corto) y "flyer" (Flyer publicitario de marca/revista de lujo, donde Milena modela un producto como perfume, cosmético, bolso, o calzado).
+
 Responde ÚNICAMENTE con un arreglo JSON válido de objetos, con la siguiente estructura:
 [
   {
     "title": "Título corto y magnético de la idea",
-    "type": "image", "carousel" o "video",
-    "location": "Ubicación de la escena (ej. Aeropuerto de Medellín o Cafetería en Buenos Aires)",
+    "type": "image", "carousel", "video" o "flyer",
+    "location": "Ubicación de la escena (ej. Gimnasio boutique, Rooftop sofisticado en Medellín o Estudio de fotografía en New York)",
     "description": "Descripción detallada de la escena y el objetivo del post"
   }
 ]
@@ -101,7 +115,8 @@ No añadas bloques de código markdown ni texto adicional fuera del JSON.`;
 export async function generatePromptForFlow(
   avatar: AvatarIdentity,
   idea: PostIdea,
-  apiKey: string
+  apiKey: string,
+  audioLanguage?: "es" | "en"
 ): Promise<string> {
 
   let sceneGuidelines = "";
@@ -111,8 +126,8 @@ SHOT 1: [Detailed description of Shot 1]
 SHOT 2: [Detailed description of Shot 2]
 SHOT 3: [Detailed description of Shot 3]
 
-CRITICAL CONSISTENCY RULE: Describe a specific, casual OUTFIT/DYNAMIC CLOTHING, hairstyle, lighting, and environment in complete detail inside SHOT 1. For SHOT 2 and SHOT 3, you MUST repeat the exact same detailed description of the outfit, hairstyle, setting, and lighting, but change only the camera angle, shot scale, and physical action/expression of the avatar. Do NOT abbreviate, summarize, or refer back to SHOT 1; every single shot prompt must be fully self-contained so that Flow has all context when processed separately.
-Describe camera movements (mobile phone camera angles, UGC aesthetic) and relaxed physical actions for each shot. Write the labels strictly on new lines so they can be easily parsed.`;
+CRITICAL CONSISTENCY RULE: Describe a specific, casual OUTFIT/DYNAMIC CLOTHING (highly detailed, including colors, fabric, and garments), hairstyle, lighting, and environment in complete detail inside SHOT 1. For SHOT 2 and SHOT 3, you MUST repeat the exact same detailed description of the outfit, hairstyle, setting, and lighting, but change only the camera angle, shot scale, and physical action/expression of the avatar. Do NOT abbreviate, summarize, or refer back to SHOT 1; every single shot prompt must be fully self-contained so that Flow has all context when processed separately.
+Describe camera movements (mobile phone camera angles, UGC aesthetic) and relaxed physical actions for each shot. Write the labels strictly on new lines so they can be easily parsed. Strictly generate 3 shots maximum.`;
   } else if (idea.type === "carousel") {
     sceneGuidelines = `The post type is a CAROUSEL of photos. Your task is to structure the DYNAMIC SCENE section in English strictly using the following labeled format:
 PHOTO 1: [Detailed description of Photo 1]
@@ -120,28 +135,43 @@ PHOTO 2: [Detailed description of Photo 2]
 PHOTO 3: [Detailed description of Photo 3]
 PHOTO 4: [Detailed description of Photo 4]
 
-CRITICAL CONSISTENCY RULE: Describe a specific OUTFIT/DYNAMIC CLOTHING, hairstyle, lighting, and setting in complete detail inside PHOTO 1. For PHOTO 2, PHOTO 3, and PHOTO 4, you MUST repeat the exact same detailed description of the outfit, hairstyle, setting, and lighting, but change only the camera angle, shot scale, and physical pose/expression of the avatar. Do NOT abbreviate, summarize, or refer back to PHOTO 1; every single photo prompt must be fully self-contained so that Flow has all context when processed separately.
+CRITICAL CONSISTENCY RULE: Describe a specific OUTFIT/DYNAMIC CLOTHING (highly detailed, including colors, fabric, and garments), hairstyle, lighting, and setting in complete detail inside PHOTO 1. For PHOTO 2, PHOTO 3, and PHOTO 4, you MUST repeat the exact same detailed description of the outfit, hairstyle, setting, and lighting, but change only the camera angle, shot scale, and physical pose/expression of the avatar. Do NOT abbreviate, summarize, or refer back to PHOTO 1; every single photo prompt must be fully self-contained so that Flow has all context when processed separately.
 Alternate the shot scales, camera angles, and poses to create an organic story. Write the labels strictly on new lines so they can be easily parsed.`;
+  } else if (idea.type === "flyer") {
+    sceneGuidelines = `The post type is a luxury commercial ADVERTISING FLYER / MAGAZINE AD (Vogue/business modern aesthetic).
+Your task is to structure the DYNAMIC SCENE section in English describing a stunning layout featuring Milena Basset as a professional high-fashion model.
+- Describe a high-fashion, confident, and highly feminine modeling pose (sophisticated, stylish, and magnetically attractive, without being vulgar).
+- Detail the luxury clothing she is wearing (luxury blazer, designer dress, stylish items) suited for representing a high-end brand.
+- Detail the sponsored product packaging (e.g. elegant perfume bottle, cosmetics jar, luxury shoe box, or designer handbag) positioned in the foreground or held elegantly by Milena. ${idea.productImage ? "Use the uploaded product image as the main reference for the product's exact shape, label, and colors." : ""}
+- CRITICAL FLYER LAYOUT RULES: Describe the exact placement of clean, legible text on the flyer (e.g., the title "${idea.title}" printed in clean elegant gold serif font at the top). Describe the brand name "${idea.productName || "LUXE"}" written in minimalistic white logo typography in a clean corner. Ensure all text strings are enclosed strictly in double quotes to prevent AI gibberish. The flyer must feel like a premium printed page of a fashion and business magazine.`;
   } else {
-    sceneGuidelines = `The post type is a single IMAGE. Describe in English a single detailed scene with DYNAMIC CLOTHING suited for the location, a warm and authentic expression, and realistic smartphone camera lighting (UGC aesthetic).`;
+    sceneGuidelines = `The post type is a single IMAGE. Describe in English a single detailed scene with DYNAMIC CLOTHING (highly detailed, indicating specific style, garment, color, and fit) suited for the location, a warm and authentic expression, and realistic smartphone camera lighting (UGC aesthetic).`;
   }
 
   let productGuideline = "";
-  if (idea.productName) {
+  if (idea.productName && idea.type !== "flyer") {
     productGuideline = `PRODUCT INTEGRATION: The avatar must interact naturally with the following product: "${idea.productName}".
 In the DYNAMIC SCENE prompts, include explicit descriptions of where the product is or how she interacts with it (e.g., "holding the ${idea.productName} in her hand with a relaxed smile", "the ${idea.productName} card lies on the wooden desk next to her warm coffee mug", etc.). It must feel like an organic integration of her lifestyle, not an aggressive advertisement.`;
   }
 
   const systemPrompt = `Eres un ingeniero de prompts experto en la plataforma "Flow de Gemini".
-Tu tarea es generar un prompt altamente detallado y estructurado de acuerdo a los requerimientos de la plataforma Flow.
+Tu tarea es generar un prompt altamente detallado y structured de acuerdo a los requerimientos de la plataforma Flow.
 La escena que debemos describir es: "${idea.title} - ${idea.scenePrompt}". Ubicación: ${idea.location}. Tipo: ${idea.type}.
 
 ${sceneGuidelines}
 ${productGuideline}
 
+DYNAMIC CLOTHING VARIETY:
+- The avatar's outfit must be highly dynamic, fashionable, and directly match the specific location, weather, and context of the scene.
+- For cold locations (like autumn/winter in New York), use stylish coats, leather jackets, wool sweaters, or scarves.
+- For tropical settings, beaches, or summer environments, use casual summer dresses, tank tops, activewear, or beachwear.
+- For business, office, or formal settings, use smart-casual blazers, stylish blouses, or professional attire.
+- CRITICAL: Do NOT default to linen clothing, beige shirts, or neutral linen fabrics unless the user's scene prompt explicitly requests it. Create a diverse, colorful, and modern wardrobe suited for a real lifestyle influencer.
+
 CRITICAL VISUAL CONSTRAINT:
-- Absolutely NO text, letters, words, signage, ads, billboards, logos, labels, writing, or gibberish characters are allowed anywhere in the scene. The image must feel completely natural, raw, and realistic without any AI giveaways or text distortions. If there are background buildings, streets, or products, ensure they are clean, abstract, or purely textured with no readable writing.
-- The output images/videos must be ultra-realistic, natural, and raw. Avoid any artificial glossy CGI look, clean renders, or generic AI aesthetics. Focus on raw lighting and high fidelity skin textures.
+- Legible and clear text is allowed ONLY when explicitly specified in the prompt. If the scene requires text (e.g., on a paper, sticky note, whiteboard, card, screen, sign, or billboard), specify the exact text clearly in English inside double quotation marks (e.g., showing the text "START NOW").
+- Prevent AI gibberish text: Absolutely no garbled text, distorted letters, weird characters, or meaningless symbols are allowed. Ambient backgrounds, buildings, or unrelated items must be kept clean, abstract, or blank with no readable writing.
+- The output images/videos must be ultra-realistic, natural, and raw. Avoid any artificial glossy CGI look, clean renders, or generic AI aesthetics. Focus on raw lighting, high fidelity skin textures, visible skin pores, realistic skin grain, peach fuzz, and natural details.
 
 REPEATING OBJECTS ANALYSIS:
 - If this is a video or carousel and there are any physical objects (such as a specific coffee mug, fintech card, passport, bag, laptop, phone model, etc.) that repeat across different SHOTs or PHOTOs, identify them. You will list them at the very bottom in a section called "REPEATING INGREDIENTS".
@@ -150,11 +180,11 @@ Debes formatear el resultado exactamente con las siguientes secciones:
 
 HIGH-FIDELITY CHARACTER DNA: Master. ${avatar.characterDna}
 DYNAMIC SCENE: [Escribe aquí la descripción resultante redactada íntegramente en inglés basada en las directrices de arriba, de entre 150 y 250 palabras].
-AUTHENTIC CREATOR: Warm and approachable expression, natural and relaxed posture, minimal natural makeup, authentic and raw mobile aesthetic, direct eye contact with the camera, and relatable hand gestures. Shot on an ARRI Alexa 35, 8K resolution, RAW format. Soft natural lighting, 4K editing. High level of detail in skin pores, irises, and hair follicles. Neutral expression. No text, no signs, no letters, no logos in the scene.
+AUTHENTIC CREATOR: Ultra-realistic beauty portrait photography style, Sony A7R IV, 85mm macro lens, f/2.0, RAW image quality, hyper-detailed 8K resolution. Macro details showing visible skin texture, real pores, peach fuzz, tiny facial hairs, natural skin grain, soft skin imperfections, realistic iris patterns, natural eyelashes, thick organic eyebrows, realistic eye reflections. Physically accurate lighting with cinematic soft diffusion, realistic color science, luxury skincare campaign aesthetic. Warm and approachable expression, natural and relaxed posture, minimal natural makeup, authentic and raw mobile aesthetic, direct eye contact with the camera. No gibberish text, no garbled letters, no distorted logos, no random symbols in the scene. Negative prompt constraints: cartoon, CGI, 3D render, plastic skin, wax skin, airbrushed skin, over-retouched, artificial pores, fake texture, painting, illustration, low resolution, blurry, uncanny valley, excessive symmetry, skin smoothing, beauty filter.
 REPEATING INGREDIENTS: [Identify any physical objects that repeat in multiple scenes so the user can upload a consistent reference image in Flow, e.g., "red leather passport, silver laptop". If there are none, write "None".]
 ---
 AUDIO PERFORMANCE:
-${avatar.audioSettings}
+${audioLanguage === "en" ? "ACCENT: Native English speaker with a clear, warm, and natural US American accent. Zero foreign or Spanish accent. Authentic native pronunciation.\nPAUSES: Natural rhythm and breathing spaces.\nMICROPHONE: High-quality smartphone vocal note (vibrant, close, authentic).\nSPEED: Dynamic, engaging, and slightly fast, expressing enthusiasm." : avatar.audioSettings}
 VIDEO PERFORMANCE:
 ${avatar.videoSettings}
 
@@ -179,11 +209,11 @@ export async function generateInstagramCaption(
 
   let ctaGuideline = "";
   if (idea.phase === "storytelling") {
-    ctaGuideline = "Llamada a la acción blanda y enfocada en interacción personal. Pide opinión o que respondan sobre sus propios miedos de viajar o deudas (ej: '¿Y tú, también has sentido ese miedo a dar el primer paso? Te leo en los comentarios'). Prohibido ofrecer enlaces de ventas o guiar a DMs.";
+    ctaGuideline = "Pide interacción o deja una pregunta muy corta y casual (ej: '¿Cena o gym? 🥂 | Dinner or gym? 🥂'). Prohibido enlaces o ventas.";
   } else if (idea.phase === "value") {
-    ctaGuideline = "Llamada a la acción conversacional basada en valor. Pide interacción en comentarios acerca de finanzas (ej: '¿Qué app financiera usas tú?' o 'Guarda este post para tu próximo presupuesto'). Sin enlaces comerciales.";
+    ctaGuideline = "Pide una interacción basada en lifestyle (ej: 'Guarda para tu próximo viaje ✈️ | Save for your next trip ✈️').";
   } else {
-    ctaGuideline = `Llamada a la acción comercial de conversión activa. Exige que comenten una palabra clave específica (ej: 'LIBERTAD', 'BROKER' o 'PLAN') para que el bot de DMs les envíe automáticamente el enlace fintech (${avatar.monetizationLink}) que tiene un beneficio como un bono de $20 USD.`;
+    ctaGuideline = `Comercial corta. Pide comentar una palabra clave específica (ej: 'Comenta BINGO y te lo envío por DM 📲 | Comment BINGO and I will DM you 📲').`;
   }
 
   const systemPrompt = `Eres ${avatar.name}, un Avatar UGC e Influencer de Inteligencia Artificial enfocado en: ${avatar.niche}.
@@ -196,13 +226,13 @@ Redacta el pie de foto (Caption) de Instagram para la siguiente publicación:
 - Título: "${idea.title}"
 - Escena de la imagen/video: "${idea.scenePrompt}"
 
-Instrucciones para el Caption:
-1. Empieza con un gancho potente relacionado con viajes, dinero o mentalidad de libertad.
-2. Cuenta una microhistoria o da un consejo financiero práctico de valor real de acuerdo a la fase del post.
-3. Termina con la llamada a la acción (CTA) exacta para esta fase:
+Instrucciones para el Caption (Estilo Fit_Aitana / Influencer Cosmopolita):
+1. El pie de foto debe ser EXTREMADAMENTE CORTO y directo (máximo 5 a 10 palabras en total).
+2. Formato bilingüe obligado: escribe una frase o gancho muy corto en español, seguido de una barra vertical "|" y la misma frase en inglés (ej: "Atardeceres que inspiran ✨ | Sunsets that inspire ✨").
+3. Termina con la llamada a la acción (CTA) de la fase, también en formato bilingüe y súper compacta:
    ${ctaGuideline}
-4. Escribe en un formato limpio, con saltos de línea para facilitar la lectura. Usa emojis con sutileza.
-5. Agrega 5-7 hashtags relevantes al final.
+4. NO escribas historias largas, ni sermones de finanzas, ni textos técnicos. Debe verse estético, sexy, elegante y muy juvenil.
+5. Agrega únicamente 3 hashtags muy virales al final.
 
 Devuelve únicamente el copy final sin metadatos.`;
 

@@ -63,6 +63,8 @@ export default function Dashboard() {
   const [postPromptInput, setPostPromptInput] = useState("");
   const [captionOutput, setCaptionOutput] = useState("");
   const [promptOutput, setPromptOutput] = useState("");
+  const [customContext, setCustomContext] = useState("");
+  const [audioLanguage, setAudioLanguage] = useState<"es" | "en">("es");
 
   // Simulador de Chats
   const [simulations, setSimulations] = useState<ChatSimulation[]>([]);
@@ -84,7 +86,7 @@ export default function Dashboard() {
   };
 
   // Parser para extraer prompts individuales completos de tomas de video o fotos de carrusel
-  const parsePromptSteps = (fullPrompt: string, type: "carousel" | "video" | "image") => {
+  const parsePromptSteps = (fullPrompt: string, type: "carousel" | "video" | "image" | "flyer") => {
     const rawType = String(type).toLowerCase();
     const isCarousel = rawType === "carousel" || rawType === "carrusel";
     const isVideo = rawType === "video" || rawType === "reels" || rawType === "reel";
@@ -168,7 +170,27 @@ export default function Dashboard() {
     if (savedAvatarsList) {
       try { 
         initialAvatars = JSON.parse(savedAvatarsList); 
+        // Migración automática de Valeria Cruz a Milena Basset para refrescar localStorage
+        initialAvatars = initialAvatars.map(avatar => {
+          if (avatar.id === "valeria_cruz" && (avatar.name === "Valeria Cruz" || !avatar.name.includes("Milena"))) {
+            return {
+              ...avatar,
+              name: DEFAULT_AVATAR.name,
+              niche: DEFAULT_AVATAR.niche,
+              backstory: DEFAULT_AVATAR.backstory,
+              monetizationLink: DEFAULT_AVATAR.monetizationLink,
+              monetizationProduct: DEFAULT_AVATAR.monetizationProduct,
+              toneOfVoice: DEFAULT_AVATAR.toneOfVoice,
+              language: DEFAULT_AVATAR.language,
+              characterDna: DEFAULT_AVATAR.characterDna,
+              audioSettings: DEFAULT_AVATAR.audioSettings,
+              videoSettings: DEFAULT_AVATAR.videoSettings
+            };
+          }
+          return avatar;
+        });
         setAvatars(initialAvatars);
+        localStorage.setItem("ugc_multi_avatars_list", JSON.stringify(initialAvatars));
       } catch (e) { console.error(e); }
     } 
 
@@ -459,19 +481,21 @@ export default function Dashboard() {
       const response = await fetch("/api/ideas", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ avatar: currentAvatar, phase: selectedPhase, apiKey })
+        body: JSON.stringify({ avatar: currentAvatar, phase: selectedPhase, apiKey, customContext })
       });
 
       const data = await response.json();
       if (data.error) throw new Error(data.error);
 
       const newIdeas: PostIdea[] = data.ideas.map((idea: any, idx: number) => {
-        let normalizedType: "image" | "carousel" | "video" = "image";
+        let normalizedType: "image" | "carousel" | "video" | "flyer" = "image";
         const rawType = String(idea.type || "").toLowerCase();
         if (rawType.includes("carousel") || rawType.includes("carrusel")) {
           normalizedType = "carousel";
         } else if (rawType.includes("video") || rawType.includes("reel") || rawType.includes("short")) {
           normalizedType = "video";
+        } else if (rawType.includes("flyer") || rawType.includes("anuncio") || rawType.includes("poster") || rawType.includes("afiche")) {
+          normalizedType = "flyer";
         }
         return {
           id: `idea_${Date.now()}_${idx}`,
@@ -516,7 +540,8 @@ export default function Dashboard() {
         body: JSON.stringify({
           avatar: currentAvatar,
           idea: { ...idea, scenePrompt: postPromptInput || idea.scenePrompt },
-          apiKey
+          apiKey,
+          audioLanguage
         })
       });
 
@@ -1462,6 +1487,20 @@ export default function Dashboard() {
                       </p>
                     </div>
 
+                    {/* Contexto Manual Personalizado (Opcional) */}
+                    <div className="mb-4">
+                      <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                        Contexto o Temática Manual (Opcional)
+                      </label>
+                      <input
+                        type="text"
+                        value={customContext}
+                        onChange={(e) => setCustomContext(e.target.value)}
+                        placeholder="Ej: paseando por New York o en una playa de Tailandia"
+                        className="w-full bg-slate-50 border border-slate-200/50 rounded-xl px-3 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-rose-300 font-semibold"
+                      />
+                    </div>
+
                     <div className="flex justify-between items-center mb-3">
                       <span className="text-xs font-bold text-slate-800">Ideas Planificadas</span>
                       <button
@@ -1493,8 +1532,8 @@ export default function Dashboard() {
                                 <span className={`text-[7px] font-black uppercase px-2 py-0.5 rounded-full ${idea.phase === "storytelling" ? "bg-blue-50 text-blue-500 border border-blue-100" : idea.phase === "value" ? "bg-amber-50 text-amber-600 border border-amber-100" : "bg-rose-50 text-rose-500 border border-rose-100"}`}>
                                   {idea.phase === "storytelling" ? "F1: Story" : idea.phase === "value" ? "F2: Valor" : "F3: Conv"}
                                 </span>
-                                <span className={`text-[7px] font-black uppercase px-2 py-0.5 rounded-full ${idea.type === "carousel" ? "bg-purple-50 text-purple-600 border border-purple-100" : idea.type === "video" ? "bg-orange-50 text-orange-600 border border-orange-100" : "bg-emerald-50 text-emerald-600 border border-emerald-100"}`}>
-                                  {idea.type === "carousel" ? "Carrusel" : idea.type === "video" ? "Video" : "Foto"}
+                                <span className={`text-[7px] font-black uppercase px-2 py-0.5 rounded-full ${idea.type === "carousel" ? "bg-purple-50 text-purple-600 border border-purple-100" : idea.type === "video" ? "bg-orange-50 text-orange-600 border border-orange-100" : idea.type === "flyer" ? "bg-amber-50 text-amber-700 border border-amber-200" : "bg-emerald-50 text-emerald-600 border border-emerald-100"}`}>
+                                  {idea.type === "carousel" ? "Carrusel" : idea.type === "video" ? "Video" : idea.type === "flyer" ? "Flyer" : "Foto"}
                                 </span>
                               </div>
                               <button 
@@ -1620,6 +1659,30 @@ export default function Dashboard() {
                           </div>
                         </div>
 
+                        {/* Selector de idioma para Flow en caso de Video */}
+                        {selectedIdea.type === "video" && (
+                          <div className="mb-4 p-4 bg-slate-50/70 border border-slate-200/40 rounded-2xl flex items-center justify-between">
+                            <div>
+                              <span className="text-[10px] font-bold text-rose-500 uppercase tracking-wide block">Idioma de Voz (Flow)</span>
+                              <p className="text-[8px] text-slate-400 mt-0.5">Elige el idioma del audio a generar en Flow.</p>
+                            </div>
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => setAudioLanguage("es")}
+                                className={`px-3 py-1.5 rounded-xl text-[10px] font-bold border transition-all cursor-pointer ${audioLanguage === "es" ? "bg-rose-50 border-rose-200 text-rose-600 shadow-sm" : "bg-white border-slate-200/50 text-slate-600 hover:bg-slate-50"}`}
+                              >
+                                Español (Venezolano)
+                              </button>
+                              <button
+                                onClick={() => setAudioLanguage("en")}
+                                className={`px-3 py-1.5 rounded-xl text-[10px] font-bold border transition-all cursor-pointer ${audioLanguage === "en" ? "bg-rose-50 border-rose-200 text-rose-600 shadow-sm" : "bg-white border-slate-200/50 text-slate-600 hover:bg-slate-50"}`}
+                              >
+                                Inglés (Nativo US)
+                              </button>
+                            </div>
+                          </div>
+                        )}
+
                         {/* Botones de acción */}
                         <div className="grid grid-cols-2 gap-3 mb-6">
                           <button
@@ -1647,6 +1710,7 @@ export default function Dashboard() {
                                 <span className="text-[10px] font-bold text-amber-600 uppercase tracking-wider">
                                   {selectedIdea.type === "carousel" ? "Prompts de Carrusel Estructurados (Flow de Gemini)" :
                                    selectedIdea.type === "video" ? "Prompts de Video Multitoma Estructurados (Flow de Gemini)" :
+                                   selectedIdea.type === "flyer" ? "Prompt de Flyer Publicitario de Lujo (Flow de Gemini)" :
                                    "Prompt Estructurado Exclusivo (Copia a Flow de Gemini)"}
                                 </span>
                                 {promptSteps.length === 0 && (
