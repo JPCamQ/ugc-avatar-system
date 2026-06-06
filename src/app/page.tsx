@@ -165,14 +165,13 @@ export default function Dashboard() {
     }
 
     // 2. Cargar Lista de Avatares (Multi-Avatar)
-    const savedAvatarsList = localStorage.getItem("ugc_multi_avatars_list");
-    let initialAvatars: AvatarIdentity[] = [];
+    let migratedAvatars: AvatarIdentity[] = [];
     if (savedAvatarsList) {
       try { 
         initialAvatars = JSON.parse(savedAvatarsList); 
         // Migración automática de Valeria Cruz a Milena Basset para refrescar localStorage
-        initialAvatars = initialAvatars.map(avatar => {
-          if (avatar.id === "valeria_cruz" && (avatar.name === "Valeria Cruz" || !avatar.name.includes("Milena"))) {
+        migratedAvatars = initialAvatars.map(avatar => {
+          if (avatar.id === "valeria_cruz" && (avatar.name === "Valeria Cruz" || !avatar.name.includes("Milena") || avatar.niche.includes("Lifestyle Financiero"))) {
             return {
               ...avatar,
               name: DEFAULT_AVATAR.name,
@@ -189,24 +188,25 @@ export default function Dashboard() {
           }
           return avatar;
         });
-        setAvatars(initialAvatars);
-        localStorage.setItem("ugc_multi_avatars_list", JSON.stringify(initialAvatars));
-      } catch (e) { console.error(e); }
-    } 
-
-    if (initialAvatars.length === 0) {
-      initialAvatars = [DEFAULT_AVATAR];
-      setAvatars(initialAvatars);
-      localStorage.setItem("ugc_multi_avatars_list", JSON.stringify(initialAvatars));
+        setAvatars(migratedAvatars);
+        localStorage.setItem("ugc_multi_avatars_list", JSON.stringify(migratedAvatars));
+      } catch (e) { 
+        console.error(e); 
+        migratedAvatars = [DEFAULT_AVATAR];
+      }
+    } else {
+      migratedAvatars = [DEFAULT_AVATAR];
+      setAvatars(migratedAvatars);
+      localStorage.setItem("ugc_multi_avatars_list", JSON.stringify(migratedAvatars));
     }
 
     // 3. Cargar Avatar Seleccionado
     const savedSelectedId = localStorage.getItem("ugc_selected_avatar_id");
-    let currentId = savedSelectedId || initialAvatars[0].id;
+    let currentId = savedSelectedId || migratedAvatars[0].id;
     setSelectedAvatarId(currentId);
     localStorage.setItem("ugc_selected_avatar_id", currentId);
 
-    const foundAvatar = initialAvatars.find(a => a.id === currentId) || initialAvatars[0];
+    const foundAvatar = migratedAvatars.find(a => a.id === currentId) || migratedAvatars[0];
     setCurrentAvatar(foundAvatar);
 
     // 4. Cargar Ideas de Posts específicas para el Avatar activo
