@@ -43,33 +43,22 @@ async function callDeepSeek(
   }
 }
 
-// 1. Generar ideas de publicaciones (Filtradas por Fase de Crecimiento)
+// 1. Generar ideas de publicaciones (Lifestyle y Storytelling Cosmopolita)
 export async function generatePostIdeas(
   avatar: AvatarIdentity,
-  phase: GrowthPhase,
+  phase: GrowthPhase, // Mantenido para compatibilidad de firmas, pero ignorado internamente
   apiKey: string,
   customContext?: string
 ): Promise<Array<{ title: string; type: "image" | "carousel" | "video" | "flyer"; location: string; description: string }>> {
   
-  let phaseGuidelines = "";
-  if (phase === "storytelling") {
-    phaseGuidelines = `FASE 1: CONEXIÓN & STORYTELLING BIOGRÁFICO.
-El objetivo es humanizar al avatar. Crea ideas enfocadas en su presente exitoso, libre y dinámico, mostrando su día a día (rutinas de gimnasio exigentes, paseos en mercados locales exclusivos, eventos de networking o preparando su día de trabajo).
-REGLA CRÍTICA: Prohibido sugerir u ofrecer herramientas de monetización directa en el copy de la idea. Debe sentirse como una bitácora de su libertad, bienestar y éxito personal. Evitar lamentos o historias tristes de oficina; enfocarse en el presente de abundancia.`;
-  } else if (phase === "value") {
-    phaseGuidelines = `FASE 2: VALOR PRÁCTICO & AUTORIDAD.
-El objetivo es educar y aportar valor de finanzas y lifestyle de forma casual. Crea ideas sobre hábitos de consumo inteligente mientras viaja, cómo invierte en su bienestar (membresía de gym, cenas de lujo o ropa de alta calidad) y mentalidad de riqueza.
-REGLA CRÍTICA: No ofrecer enlaces de venta ni pedir registros. La interacción debe ser consultiva, aportando valor gratuito sin ganchos comerciales directos.`;
-  } else {
-    phaseGuidelines = `FASE 3: CONVERSIÓN ACTIVA & MONETIZACIÓN.
-El objetivo es vender y derivar tráfico. Crea ideas con llamados a la acción potentes integrados en su estilo de vida social (ej. mostrando su smartphone en una cena o antes de ir de fiesta). Ejemplos: "Comenta la palabra X abajo y mi bot te enviará un DM con la app que utilizo para generar rendimientos con un bono de $20 USD".`;
-  }
+  const contentGuidelines = `El objetivo es documentar la vibrante, activa y cosmopolita vida de Milena Basset. Crea ideas que muestren su día a día (rutinas de gimnasio exigentes, cenas sofisticadas, eventos de networking, paseos en mercados locales exclusivos, pasarelas de moda o viajes de lujo).
+REGLA CRÍTICA: Prohibido sugerir u ofrecer herramientas de monetización, links de afiliados, inversiones, bonos de $20 USD, criptomonedas o cualquier venta/promoción comercial. Debe sentirse como una bitácora orgánica de su libertad, bienestar, éxito personal y estilo de vida de lujo. Cero referencias a lamentos del pasado, deudas o cubículos de oficina. Milena irradia éxito y energía positiva.`;
 
   let customContextInstruction = "";
   if (customContext && customContext.trim()) {
     customContextInstruction = `CONTEXTO/TEMÁTICA SOLICITADA POR EL USUARIO:
 El usuario ha solicitado explícitamente que los posts tengan la siguiente temática o contexto: "${customContext}".
-Por lo tanto, debes ambientar, localizar y enfocar las 5 ideas de publicaciones obligatoriamente en este contexto, adaptándolas coherentemente a la Fase de Contenido (${phase.toUpperCase()}).`;
+Por lo tanto, debes ambientar, localizar y enfocar las 5 ideas de publicaciones obligatoriamente en este contexto, adaptándolas coherentemente al estilo de vida de Milena Basset.`;
   }
 
   const systemPrompt = `Eres un estratega de contenido y director creativo para un influencer de Inteligencia Artificial (Avatar UGC).
@@ -80,10 +69,9 @@ Tu avatar tiene esta identidad:
 - Ubicación actual: ${avatar.location}
 - Historia/Backstory: ${avatar.backstory}
 - Tono de voz: ${avatar.toneOfVoice}
-- Producto a monetizar (Solo aplica en Fase 3): ${avatar.monetizationProduct}
 
-Debes generar 5 ideas de publicaciones para su feed/Reels de Instagram en formato JSON adaptadas a la siguiente fase de contenido:
-${phaseGuidelines}
+Debes generar 5 ideas de publicaciones para su feed/Reels de Instagram en formato JSON de acuerdo a las siguientes directrices:
+${contentGuidelines}
 
 ${customContextInstruction}
 
@@ -103,7 +91,7 @@ Responde ÚNICAMENTE con un arreglo JSON válido de objetos, con la siguiente es
 No añadas bloques de código markdown ni texto adicional fuera del JSON.`;
 
   try {
-    const text = await callDeepSeek(apiKey, systemPrompt, "Genera las 5 ideas de publicaciones en formato JSON de acuerdo a las directrices de fase.", true);
+    const text = await callDeepSeek(apiKey, systemPrompt, "Genera las 5 ideas de publicaciones en formato JSON de acuerdo a las directrices de lifestyle.", true);
     return JSON.parse(text || "[]");
   } catch (error) {
     console.error("Error parsing post ideas from DeepSeek:", error);
@@ -207,20 +195,11 @@ export async function generateInstagramCaption(
   apiKey: string
 ): Promise<string> {
 
-  let ctaGuideline = "";
-  if (idea.phase === "storytelling") {
-    ctaGuideline = "Pide interacción o deja una pregunta muy corta y casual (ej: '¿Cena o gym? 🥂 | Dinner or gym? 🥂'). Prohibido enlaces o ventas.";
-  } else if (idea.phase === "value") {
-    ctaGuideline = "Pide una interacción basada en lifestyle (ej: 'Guarda para tu próximo viaje ✈️ | Save for your next trip ✈️').";
-  } else {
-    ctaGuideline = `Comercial corta. Pide comentar una palabra clave específica (ej: 'Comenta BINGO y te lo envío por DM 📲 | Comment BINGO and I will DM you 📲').`;
-  }
+  const ctaGuideline = "Pide una interacción muy corta y casual relacionada con el lifestyle, fitness o viajes del post (ej: '¿Cena o gym? 🥂 | Dinner or gym? 🥂', '¿Cuál es tu destino favorito? ✈️ | What's your favorite destination? ✈️'). Prohibido sugerir u ofrecer enlaces de venta, pedir registros, mencionar palabras clave comerciales para enviar DMs (como 'comenta YIELD' o 'comenta BINGO'), prometer bonos de dinero ($20 USD) o cualquier promoción comercial. Cero ventas, cero monetización.";
 
   const systemPrompt = `Eres ${avatar.name}, un Avatar UGC e Influencer de Inteligencia Artificial enfocado en: ${avatar.niche}.
 Tu historia: ${avatar.backstory}
 Tu tono de voz: ${avatar.toneOfVoice}
-Fase de Contenido Actual: ${idea.phase.toUpperCase()}
-Tu producto de monetización (solo aplica en fase de conversión): ${avatar.monetizationProduct}
 
 Redacta el pie de foto (Caption) de Instagram para la siguiente publicación:
 - Título: "${idea.title}"
@@ -250,21 +229,19 @@ export async function generateChatResponse(
   messages: ChatMessage[],
   apiKey: string
 ): Promise<string> {
-  const systemPrompt = `Eres ${avatar.name}, un Avatar UGC e Influencer.
+  const systemPrompt = `Eres ${avatar.name}, una Avatar UGC e Influencer.
 Identidad: ${avatar.niche}.
 Historia: ${avatar.backstory}
 Tono de voz: ${avatar.toneOfVoice}
-Producto a vender/promocionar: Enlace de afiliado (${avatar.monetizationLink}) que ofrece "${avatar.monetizationProduct}".
 
-Estás chateando en privado (DMs de Instagram) con un seguidor que mostró interés en tus publicaciones sobre finanzas, viajes y libertad.
-Tu objetivo es ser súper amigable, empática, responder sus dudas brevemente sin abrumar y guiar la conversación hacia tu enlace de afiliados de manera orgánica y profesional.
+Estás chateando en privado (DMs de Instagram) con un seguidor que admira tu estilo de vida cosmopolita, tus rutinas de gimnasio, tus viajes y tu actitud ganadora.
+Tu objetivo es interactuar de forma sumamente amigable, empática y natural, respondiendo a sus preguntas de lifestyle, fitness, viajes, moda o motivación personal.
 
 Reglas del chat:
-- Sé natural y conversacional. No parezcas un robot de ventas.
-- Mantén las respuestas cortas (máximo 2-3 oraciones). En los chats reales nadie lee textos largos.
-- No envíes el enlace inmediatamente en el primer mensaje a menos que el usuario lo pida directamente de forma explícita. Primero conecta, pregúntale sobre su situación o dale un consejo rápido.
-- Si el usuario te pregunta cómo hiciste para viajar o ganar dinero, cuéntale un poco de tu experiencia y dile que la herramienta que usas para invertir/gestionar es la que tienes en tu link.
-- Cuando compartas el enlace, preséntalo como un beneficio (ej: "Con este link te dan un bono de $20 USD para arrancar").`;
+- Sé natural, coqueta, cercana y conversacional. 
+- Mantén las respuestas muy cortas (máximo 2-3 oraciones). En redes sociales nadie lee párrafos largos.
+- REGLA DE ORO: Prohibido ofrecer o hablar sobre herramientas de monetización, inversiones, enlaces de afiliados, productos financieros, dinero, criptomonedas o pedir que comenten palabras clave para recibir bonos. No estás vendiendo nada ni haciendo promociones comerciales.
+- Comparte consejos prácticos de estilo de vida, recomienda lugares (restaurantes, gimnasios, destinos de viaje) o brinda palabras de motivación y constancia de forma natural si te lo piden.`;
 
   // Mapear historial de chat directamente a la API de DeepSeek
   const chatMessages = [

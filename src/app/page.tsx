@@ -54,7 +54,6 @@ export default function Dashboard() {
   const [generatingSetup, setGeneratingSetup] = useState(false);
 
   // Planificador de Contenido
-  const [selectedPhase, setSelectedPhase] = useState<GrowthPhase>("storytelling");
   const [postIdeas, setPostIdeas] = useState<PostIdea[]>([]);
   const [selectedIdea, setSelectedIdea] = useState<PostIdea | null>(null);
   const [generatingIdeas, setGeneratingIdeas] = useState(false);
@@ -224,29 +223,29 @@ export default function Dashboard() {
     if (savedSimulations) {
       try { setSimulations(JSON.parse(savedSimulations)); } catch (e) { console.error(e); }
     } else {
-      // Inicializar simulaciones por defecto para Valeria Cruz
+      // Inicializar simulaciones por defecto para Milena Basset
       if (currentId === "valeria_cruz") {
         const defaultSims: ChatSimulation[] = [
           {
             id: "sim1",
             avatarId: "valeria_cruz",
-            userName: "mariana_finanzas",
-            userBio: "24 años. Estudiante de economía de Bogotá. Quiere aprender a generar ingresos online para pagarse un viaje de mochilera.",
+            userName: "mariana_style",
+            userBio: "24 años. Estudiante de diseño de Bogotá. Le apasiona la moda y el estilo de vida de Milena.",
             status: "active",
             messages: [
-              { id: "m1", sender: "user", text: "Hola Valeria! Me encantan tus posts de viaje, en serio viajas sola?", timestamp: "10:30 AM" },
-              { id: "m2", sender: "avatar", text: "¡Hola Mariana! Qué lindo saludarte. Sii, viajo sola desde hace casi un año. Al principio da un poquito de miedo pero es la experiencia más libre del mundo. ¿Tienes pensado algún destino?", timestamp: "10:32 AM" },
-              { id: "m3", sender: "user", text: "Sí, me encantaría recorrer el cono sur, pero no sé cómo financiarlo siendo estudiante, no me alcanza lo que ahorro trabajando a medio tiempo.", timestamp: "10:35 AM" }
+              { id: "m1", sender: "user", text: "¡Hola Milena! Me encantan tus posts de viaje, ¿de dónde es el bolso que mostraste ayer?", timestamp: "10:30 AM" },
+              { id: "m2", sender: "avatar", text: "¡Hola Mariana! Qué lindo saludarte. Sii, ese bolso es una de mis piezas favoritas, es una colaboración exclusiva de marca. Te paso el dato por aquí si quieres.", timestamp: "10:32 AM" },
+              { id: "m3", sender: "user", text: "¡Sii por fa! Es que me encanta cómo combinas tu ropa, tienes demasiado estilo.", timestamp: "10:35 AM" }
             ]
           },
           {
             id: "sim2",
             avatarId: "valeria_cruz",
-            userName: "carlos_trip90",
-            userBio: "31 años. Desarrollador junior de CDMX. Quiere ser nómada digital pero le da miedo no tener un flujo estable de ahorros o inversiones.",
+            userName: "carlos_fit90",
+            userBio: "31 años. Entrenador personal de CDMX. Sigue a Milena por su disciplina en el gimnasio boutique y su mentalidad ganadora.",
             status: "active",
             messages: [
-              { id: "mc1", sender: "user", text: "Hola! Vi tu Reel sobre la app de inversiones que te da libertad en los viajes. Es seguro para alguien que está empezando?", timestamp: "Ayer" }
+              { id: "mc1", sender: "user", text: "¡Hola Milena! Vi tu Reel entrenando en el gym. ¿Qué rutina de hombros recomiendas para mantener esa definición?", timestamp: "Ayer" }
             ]
           }
         ];
@@ -483,7 +482,7 @@ export default function Dashboard() {
       const response = await fetch("/api/ideas", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ avatar: currentAvatar, phase: selectedPhase, apiKey, customContext })
+        body: JSON.stringify({ avatar: currentAvatar, phase: "storytelling" as const, apiKey, customContext })
       });
 
       const data = await response.json();
@@ -505,7 +504,7 @@ export default function Dashboard() {
           title: idea.title,
           type: normalizedType,
           location: idea.location,
-          phase: selectedPhase,
+          phase: "storytelling" as const,
           scenePrompt: idea.description,
           formattedFlowPrompt: "",
           instagramCaption: "",
@@ -517,7 +516,7 @@ export default function Dashboard() {
       const updatedIdeas = [...newIdeas, ...postIdeas].slice(0, 20);
       setPostIdeas(updatedIdeas);
       localStorage.setItem(`ugc_post_ideas_${currentAvatar.id}`, JSON.stringify(updatedIdeas));
-      showSuccess(`Generadas 5 ideas de la fase ${selectedPhase.toUpperCase()}`);
+      showSuccess("Generadas 5 ideas de contenido con éxito");
     } catch (error: any) {
       console.error(error);
       setErrorMsg(error.message || "Error al conectar con la API de DeepSeek.");
@@ -759,7 +758,7 @@ export default function Dashboard() {
     }
   };
 
-  // Simulación: Inyectar link de afiliados en el chat
+  // Simulación: Inyectar recomendación de lifestyle en el chat
   const handleForceSendLink = () => {
     if (!activeSimulationId) return;
     const currentSim = simulations.find(s => s.id === activeSimulationId);
@@ -768,7 +767,7 @@ export default function Dashboard() {
     const linkMsg: ChatMessage = {
       id: `msg_link_${Date.now()}`,
       sender: "avatar",
-      text: `¡Hola de nuevo! Aquí te dejo el enlace de registro que uso para mis inversiones. Si te registras hoy, te regalan un cupo extra y un bono de $20 USD para arrancar de inmediato: ${currentAvatar.monetizationLink} ¡Cualquier consulta me escribes!`,
+      text: `¡Hola! Te recomiendo muchísimo visitar el Rooftop 360 en El Poblado, Medellín. Es mi lugar favorito para tomar un café y planear mis proyectos de lifestyle y moda. ¡Te va a encantar! ✨`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
@@ -785,12 +784,12 @@ export default function Dashboard() {
 
   // Crear nueva simulación de chat
   const handleCreateNewSim = () => {
-    const names = ["camila_ventures", "mateo_inversor", "sofia_nomadgirl", "daniel_libertad"];
+    const names = ["camila_style", "mateo_fit", "sofia_nomadgirl", "daniel_lifestyle"];
     const bios = [
-      "25 años. De Santiago. Busca opciones de inversión mínimas porque tiene poco presupuesto.",
-      "29 años. De Bogotá. Ingeniero mecánico. Quiere dejar su empleo tradicional pero necesita un colchón financiero.",
-      "26 años. De Buenos Aires. Emprendedora. Quiere viajar sola y busca ideas sobre ingresos pasivos digitales.",
-      "32 años. De Madrid. Nómada. Quiere saber qué broker o app fintech es más rentable para usar desde varios países."
+      "25 años. De Santiago. Apasionada de la moda y el diseño de alta costura. Busca inspiración y tips de estilo.",
+      "29 años. De Bogotá. Amante del fitness y la vida saludable. Busca motivación y ideas de rutinas exigentes.",
+      "26 años. De Buenos Aires. Viajera empedernida, siempre buscando cafés estéticos y spots sofisticados.",
+      "32 años. De Madrid. Apasionado del networking, viajes y el lifestyle de lujo. Sigue a Milena por su mentalidad positiva."
     ];
     const randIdx = Math.floor(Math.random() * names.length);
     
@@ -801,7 +800,7 @@ export default function Dashboard() {
       userBio: bios[randIdx],
       status: "active",
       messages: [
-        { id: `m_${Date.now()}`, sender: "user", text: `Hola! Me encantan tus posts de viaje. ¿Cómo lograste monetizar tu marca personal para viajar sola?`, timestamp: "Justo ahora" }
+        { id: `m_${Date.now()}`, sender: "user", text: `¡Hola Milena! Me encanta tu contenido. ¿Cómo haces para mantenerte tan disciplinada con el gym mientras viajas?`, timestamp: "Justo ahora" }
       ]
     };
 
@@ -859,7 +858,7 @@ export default function Dashboard() {
                   UGC Avatar<span className="text-rose-500 font-medium"> Studio</span>
                 </span>
                 <span className="px-2 py-0.5 rounded-md bg-rose-50 border border-rose-100 text-[9px] font-bold text-rose-500 uppercase tracking-widest">
-                  Fase 2
+                  v2.0
                 </span>
               </div>
               <p className="text-[10px] text-slate-500">Gestor de Influencers AI y Embudos de Redes Sociales</p>
@@ -1049,18 +1048,20 @@ export default function Dashboard() {
             <div className="w-full border-t border-slate-100 my-4" />
 
             {/* Producto de afiliado actual */}
-            <div className="w-full text-left">
-              <span className="text-[9px] text-slate-400 uppercase font-bold tracking-wider">Afiliado Fintech</span>
-              <a 
-                href={currentAvatar.monetizationLink} 
-                target="_blank" 
-                rel="noreferrer" 
-                className="flex items-center justify-between text-xs text-amber-600 font-semibold hover:underline mt-0.5"
-              >
-                <span className="truncate max-w-[170px]">{currentAvatar.monetizationProduct}</span>
-                <ExternalLink className="w-3 h-3 flex-shrink-0 text-slate-400" />
-              </a>
-            </div>
+            {currentAvatar.monetizationProduct && (
+              <div className="w-full text-left">
+                <span className="text-[9px] text-slate-400 uppercase font-bold tracking-wider">Colaboración / Marca</span>
+                <a 
+                  href={currentAvatar.monetizationLink} 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="flex items-center justify-between text-xs text-amber-600 font-semibold hover:underline mt-0.5"
+                >
+                  <span className="truncate max-w-[170px]">{currentAvatar.monetizationProduct}</span>
+                  <ExternalLink className="w-3 h-3 flex-shrink-0 text-slate-400" />
+                </a>
+              </div>
+            )}
           </div>
 
           {/* Menú de pestañas */}
@@ -1084,7 +1085,7 @@ export default function Dashboard() {
               className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${activeTab === "planner" ? "bg-gradient-to-r from-rose-500/10 to-amber-500/10 border border-rose-100 text-rose-600 shadow-sm" : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"}`}
             >
               <Calendar className="w-4 h-4 text-amber-500" />
-              Planificador en Fases
+              Planificador Editorial
             </button>
             <button
               onClick={() => setActiveTab("chat")}
@@ -1098,7 +1099,7 @@ export default function Dashboard() {
               className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${activeTab === "metrics" ? "bg-gradient-to-r from-rose-500/10 to-amber-500/10 border border-rose-100 text-rose-600 shadow-sm" : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"}`}
             >
               <DollarSign className="w-4 h-4 text-emerald-500" />
-              Embudo Financiero
+              Métricas de Crecimiento
             </button>
           </div>
           
@@ -1468,27 +1469,6 @@ export default function Dashboard() {
                 <div className="md:col-span-2 bg-white/70 backdrop-blur-md border border-white/60 rounded-3xl p-5 flex flex-col justify-between max-h-[620px] shadow-lg shadow-slate-100/50">
                   <div>
                     
-                    {/* Selector de fase */}
-                    <div className="mb-4">
-                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Fase de Crecimiento para Contenido</span>
-                      <div className="grid grid-cols-3 gap-1 bg-slate-100 p-1 rounded-xl">
-                        {(["storytelling", "value", "conversion"] as const).map(p => (
-                          <button
-                            key={p}
-                            onClick={() => setSelectedPhase(p)}
-                            className={`py-1.5 rounded-lg text-[9px] font-extrabold uppercase transition-all cursor-pointer ${selectedPhase === p ? "bg-white text-rose-500 shadow-sm border border-slate-200/50" : "text-slate-500 hover:text-slate-800"}`}
-                          >
-                            {p === "storytelling" ? "Fase 1" : p === "value" ? "Fase 2" : "Fase 3"}
-                          </button>
-                        ))}
-                      </div>
-                      <p className="text-[9px] text-slate-400 mt-1.5 leading-normal">
-                        {selectedPhase === "storytelling" ? "Storytelling y empatía (viajes y pasado de deudas). Cero ventas." :
-                         selectedPhase === "value" ? "Consejos de finanzas prácticos y lifestyle sin enlaces comerciales." :
-                         "Conversión agresiva (Comenta y te envío el bono de $20 USD)."}
-                      </p>
-                    </div>
-
                     {/* Contexto Manual Personalizado (Opcional) */}
                     <div className="mb-4">
                       <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">
@@ -1511,7 +1491,7 @@ export default function Dashboard() {
                         className="px-2.5 py-1.5 rounded-xl bg-rose-500 hover:bg-rose-600 disabled:opacity-50 text-white transition-all cursor-pointer flex items-center gap-1 text-[10px] font-bold shadow-md shadow-rose-500/10"
                       >
                         {generatingIdeas ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
-                        Generar {selectedPhase === "storytelling" ? "Fase 1" : selectedPhase === "value" ? "Fase 2" : "Fase 3"}
+                        Generar 5 Ideas
                       </button>
                     </div>
 
@@ -1520,7 +1500,7 @@ export default function Dashboard() {
                       {postIdeas.length === 0 ? (
                         <div className="text-center py-16 text-slate-400 border border-dashed border-slate-200 rounded-2xl bg-white/20">
                           <Calendar className="w-8 h-8 mx-auto mb-1 opacity-20" />
-                          <p className="text-[10px] max-w-[170px] mx-auto leading-relaxed">No hay posts. Genera ideas en la fase elegida para iniciar la secuencia de Valeria Cruz.</p>
+                          <p className="text-[10px] max-w-[170px] mx-auto leading-relaxed">No hay posts. Genera ideas para iniciar el planificador de contenido de Milena Basset.</p>
                         </div>
                       ) : (
                         postIdeas.map((idea) => (
@@ -1531,9 +1511,6 @@ export default function Dashboard() {
                           >
                             <div className="flex justify-between items-start">
                               <div className="flex gap-1.5">
-                                <span className={`text-[7px] font-black uppercase px-2 py-0.5 rounded-full ${idea.phase === "storytelling" ? "bg-blue-50 text-blue-500 border border-blue-100" : idea.phase === "value" ? "bg-amber-50 text-amber-600 border border-amber-100" : "bg-rose-50 text-rose-500 border border-rose-100"}`}>
-                                  {idea.phase === "storytelling" ? "F1: Story" : idea.phase === "value" ? "F2: Valor" : "F3: Conv"}
-                                </span>
                                 <span className={`text-[7px] font-black uppercase px-2 py-0.5 rounded-full ${idea.type === "carousel" ? "bg-purple-50 text-purple-600 border border-purple-100" : idea.type === "video" ? "bg-orange-50 text-orange-600 border border-orange-100" : idea.type === "flyer" ? "bg-amber-50 text-amber-700 border border-amber-200" : "bg-emerald-50 text-emerald-600 border border-emerald-100"}`}>
                                   {idea.type === "carousel" ? "Carrusel" : idea.type === "video" ? "Video" : idea.type === "flyer" ? "Flyer" : "Foto"}
                                 </span>
@@ -1562,7 +1539,7 @@ export default function Dashboard() {
                   </div>
 
                   <p className="text-[9px] text-slate-400 mt-4 text-center border-t border-slate-100 pt-2 leading-relaxed">
-                    Valeria Cruz debe usar posts de <strong>Fase 1 y 2</strong> el primer mes para calentar su cuenta nueva antes de pasar a la <strong>Fase 3</strong> de ventas.
+                    Milena Basset documenta su vida cosmopolita de alta costura, gimnasio y viajes de lujo, inspirando de forma bilingüe.
                   </p>
                 </div>
 
@@ -1577,9 +1554,6 @@ export default function Dashboard() {
                           <div>
                             <div className="flex items-center gap-1.5">
                               <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wide">Mesa de Edición</span>
-                              <span className={`px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ${selectedIdea.phase === "storytelling" ? "bg-blue-50 text-blue-500" : selectedIdea.phase === "value" ? "bg-amber-50 text-amber-600" : "bg-rose-50 text-rose-500"}`}>
-                                {selectedIdea.phase === "storytelling" ? "Fase 1: Storytelling" : selectedIdea.phase === "value" ? "Fase 2: Valor" : "Fase 3: Conversión"}
-                              </span>
                             </div>
                             <h3 className="text-sm font-extrabold text-slate-900 mt-1">{selectedIdea.title}</h3>
                             <p className="text-[10px] text-slate-500 mt-0.5 flex items-center gap-1 font-semibold">
@@ -1792,9 +1766,6 @@ export default function Dashboard() {
                               <div className="flex justify-between items-center mb-1.5">
                                 <span className="text-[10px] font-bold text-rose-500 uppercase tracking-wider flex items-center gap-1.5">
                                    {"Copy / Caption de Instagram"}
-                                  {selectedIdea.phase === "conversion" && (
-                                    <span className="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-600 text-[8px] font-black uppercase">Monetiza</span>
-                                  )}
                                 </span>
                                 <button
                                   onClick={() => triggerCopy(captionOutput, "insta_caption")}
@@ -1821,7 +1792,7 @@ export default function Dashboard() {
                       <Calendar className="w-12 h-12 text-slate-300 mb-3 animate-pulse" />
                       <h4 className="text-sm font-bold text-slate-700">Ningún Post Seleccionado</h4>
                       <p className="text-xs text-slate-500 max-w-xs mt-1 leading-relaxed">
-                        Selecciona un post de la izquierda para estructurar sus directrices de vestuario y generar el copy acorde a su fase actual.
+                        Selecciona un post de la izquierda para estructurar sus directrices de vestuario y generar su caption de Instagram.
                       </p>
                     </div>
                   )}
@@ -2020,20 +1991,20 @@ export default function Dashboard() {
                               </div>
 
                               <div className="border-t border-slate-100 pt-3">
-                                <span className="text-[9px] text-slate-400 uppercase font-bold tracking-wider">Fases del Embudo DM</span>
+                                <span className="text-[9px] text-slate-400 uppercase font-bold tracking-wider">Objetivos de Engagement</span>
                                 <div className="mt-2 space-y-1.5">
                                   <div className="flex items-center justify-between text-[10px]">
-                                    <span className="text-slate-500 font-semibold">1. Conexión & Charla</span>
+                                    <span className="text-slate-500 font-semibold">1. Conexión Inicial</span>
                                     <span className="text-emerald-600 font-bold">Hecho</span>
                                   </div>
                                   <div className="flex items-center justify-between text-[10px]">
-                                    <span className="text-slate-500 font-semibold">2. Encontrar necesidad</span>
+                                    <span className="text-slate-500 font-semibold">2. Charla de Lifestyle</span>
                                     <span className="text-emerald-600 font-bold">Hecho</span>
                                   </div>
                                   <div className="flex items-center justify-between text-[10px]">
-                                    <span className="text-slate-500 font-semibold">3. Enlace (Fintech)</span>
+                                    <span className="text-slate-500 font-semibold">3. Fidelización Seguidor</span>
                                     <span className={sim?.status === "converted" ? "text-emerald-600 font-bold" : "text-amber-500 font-bold animate-pulse"}>
-                                      {sim?.status === "converted" ? "Convertido" : "Pendiente"}
+                                      {sim?.status === "converted" ? "Fidelizado" : "En curso"}
                                     </span>
                                   </div>
                                 </div>
@@ -2045,11 +2016,11 @@ export default function Dashboard() {
                                 onClick={handleForceSendLink}
                                 className="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-rose-400 hover:opacity-95 text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-md shadow-rose-500/10"
                               >
-                                <Wallet className="w-4 h-4" />
-                                Enviar Link de Ventas
+                                <Compass className="w-4 h-4" />
+                                Enviar Recomendación
                               </button>
                               <p className="text-[8px] text-slate-400 text-center leading-normal">
-                                Envía de forma forzada el enlace de afiliado de {currentAvatar.name} en el chat.
+                                Envía de forma forzada una recomendación de spot de lifestyle de {currentAvatar.name} en el chat.
                               </p>
                             </div>
                           </>
@@ -2079,10 +2050,10 @@ export default function Dashboard() {
                 <div className="bg-white/70 backdrop-blur-md border border-white/60 rounded-3xl p-6 sm:p-8 flex-1 flex flex-col justify-between shadow-lg shadow-slate-100/50">
                   <div>
                     <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2 mb-2">
-                      <DollarSign className="w-5 h-5 text-emerald-600" />
-                      Embudo Financiero & Casos de Estudio de Monetización
+                      <TrendingUp className="w-5 h-5 text-rose-500" />
+                      Métricas de Impacto de Marca & Engagement de Comunidad
                     </h2>
-                    <p className="text-xs text-slate-500 mb-6">Muestra métricas reales simuladas a tus clientes potenciales para venderles la creación de sus avatares AI.</p>
+                    <p className="text-xs text-slate-500 mb-6">Muestra el alcance, visualizaciones y fidelización de la comunidad de tu avatar para valorar su impacto de marca en redes sociales.</p>
 
                     {/* Fila de Métricas */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
@@ -2095,7 +2066,7 @@ export default function Dashboard() {
                       </div>
 
                       <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl text-left">
-                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Clicks Totales DMs</span>
+                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Mensajes Recibidos DMs</span>
                         <div className="flex items-baseline gap-1.5 mt-1">
                           <span className="text-2xl font-black text-slate-800">3,124</span>
                           <span className="text-[10px] text-emerald-500 font-bold">+8.4%</span>
@@ -2103,18 +2074,18 @@ export default function Dashboard() {
                       </div>
 
                       <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl text-left">
-                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Registros (Broker)</span>
+                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Alcance Semanal</span>
                         <div className="flex items-baseline gap-1.5 mt-1">
-                          <span className="text-2xl font-black text-slate-800">412</span>
-                          <span className="text-[10px] text-emerald-500 font-bold">13.2% Conv</span>
+                          <span className="text-2xl font-black text-slate-800">245k</span>
+                          <span className="text-[10px] text-emerald-500 font-bold">+18.4%</span>
                         </div>
                       </div>
 
-                      <div className="bg-emerald-50 border border-emerald-100 p-4 rounded-2xl text-left">
-                        <span className="text-[9px] font-bold text-emerald-600 uppercase tracking-wider block">Comisión Mensual (Neto)</span>
+                      <div className="bg-rose-50 border border-rose-100 p-4 rounded-2xl text-left">
+                        <span className="text-[9px] font-bold text-rose-600 uppercase tracking-wider block">Engagement Promedio</span>
                         <div className="flex items-baseline gap-1.5 mt-1">
-                          <span className="text-2xl font-black text-emerald-600">$8,240 USD</span>
-                          <span className="text-[10px] text-emerald-500 font-bold">Activo</span>
+                          <span className="text-2xl font-black text-rose-600">5.8%</span>
+                          <span className="text-[10px] text-rose-500 font-bold">Muy Alto</span>
                         </div>
                       </div>
                     </div>
@@ -2122,8 +2093,8 @@ export default function Dashboard() {
                     {/* Tabla de Conversiones */}
                     <div className="border border-slate-100 rounded-2xl overflow-hidden bg-white shadow-sm">
                       <div className="px-4 py-3 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
-                        <h4 className="text-xs font-bold text-slate-800">Registro de Conversiones Automatizadas en DMs</h4>
-                        <span className="px-2 py-0.5 rounded bg-emerald-50 text-[9px] text-emerald-600 font-bold uppercase">En vivo</span>
+                        <h4 className="text-xs font-bold text-slate-800">Registro de Interacciones de Alto Valor en DMs</h4>
+                        <span className="px-2 py-0.5 rounded bg-rose-50 text-[9px] text-rose-500 font-bold uppercase">En vivo</span>
                       </div>
                       <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse text-xs">
@@ -2131,31 +2102,31 @@ export default function Dashboard() {
                             <tr className="border-b border-slate-100 bg-slate-50/50 text-slate-400 font-bold text-[9px] uppercase">
                               <th className="p-3">Seguidor</th>
                               <th className="p-3">Nacionalidad</th>
-                              <th className="p-3">Acción Conversacional</th>
-                              <th className="p-3">Comisión Ganada</th>
+                              <th className="p-3">Interacción</th>
+                              <th className="p-3">Impacto / Estado</th>
                               <th className="p-3 text-right">Tiempo</th>
                             </tr>
                           </thead>
                           <tbody>
                             <tr className="border-b border-slate-100 hover:bg-slate-50/50">
-                              <td className="p-3 text-slate-800 font-semibold">@sofia_travels</td>
+                              <td className="p-3 text-slate-800 font-semibold">@sofia_style</td>
                               <td className="p-3 text-slate-500">Buenos Aires</td>
-                              <td className="p-3 text-emerald-600 font-semibold">Registro de Cuenta + Fondeo</td>
-                              <td className="p-3 text-slate-800 font-bold">$20.00 USD</td>
+                              <td className="p-3 text-rose-600 font-semibold">Pregunta por Outfit en Foto</td>
+                              <td className="p-3 text-slate-800 font-bold">Fidelizado / Conectado</td>
                               <td className="p-3 text-slate-400 text-right">Hace 15 min</td>
                             </tr>
                             <tr className="border-b border-slate-100 hover:bg-slate-50/50">
-                              <td className="p-3 text-slate-800 font-semibold">@marcos_fintech</td>
+                              <td className="p-3 text-slate-800 font-semibold">@marcos_fit</td>
                               <td className="p-3 text-slate-500">Santiago</td>
-                              <td className="p-3 text-emerald-600 font-semibold">Apertura de Cuenta Premium</td>
-                              <td className="p-3 text-slate-800 font-bold">$20.00 USD</td>
+                              <td className="p-3 text-rose-600 font-semibold">Recomendación de Spot en Medellín</td>
+                              <td className="p-3 text-slate-800 font-bold">Fidelizado / Conectado</td>
                               <td className="p-3 text-slate-400 text-right">Hace 1 hora</td>
                             </tr>
                             <tr className="border-b border-slate-100 hover:bg-slate-50/50">
-                              <td className="p-3 text-slate-800 font-semibold">@mariana_finanzas</td>
+                              <td className="p-3 text-slate-800 font-semibold">@mariana_nomad</td>
                               <td className="p-3 text-slate-500">Bogotá</td>
-                              <td className="p-3 text-emerald-600 font-semibold">Registro Exitoso desde DM</td>
-                              <td className="p-3 text-slate-800 font-bold">$20.00 USD</td>
+                              <td className="p-3 text-rose-600 font-semibold">Pregunta por Rutina Gym de Reels</td>
+                              <td className="p-3 text-slate-800 font-bold">Fidelizado / Conectado</td>
                               <td className="p-3 text-slate-400 text-right">Hace 2 horas</td>
                             </tr>
                           </tbody>
@@ -2168,11 +2139,11 @@ export default function Dashboard() {
                   {/* Sección Informativa Comercial */}
                   <div className="mt-6 p-5 rounded-2xl bg-slate-50 border border-slate-200/50">
                     <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                      <TrendingUp className="w-4 h-4 text-rose-500" />
-                      Estrategia de Ventas B2B (Servicio de Agencia)
+                      <Sparkles className="w-4 h-4 text-rose-500" />
+                      Estrategia de Crecimiento & Engagement de Marca Personal
                     </h4>
                     <p className="text-[10px] text-slate-500 mt-1 leading-relaxed">
-                      El avatar de **Valeria Cruz** es tu muestra en vivo de que el ecosistema funciona de forma rentable. Cuando prospectes clientes (coaches, marcas personales o empresas fintech), muéstrales este dashboard. Enséñales cómo Valeria planifica en base a fases su contenido, genera prompts consistentes con vestuario dinámico para la plataforma Flow de Gemini, y cierra conversiones respondiendo DMs automáticamente en español sin intervención humana.
+                      El avatar de **Milena Basset** es tu muestra en vivo de la efectividad del contenido de lifestyle y engagement orgánico. Enséñales cómo Milena planifica su contenido de estilo de vida cosmopolita, genera prompts de video consistentes de 3 tomas para la plataforma Flow de Gemini, e interactúa con su comunidad respondiendo DMs de forma automatizada, natural y bilingüe.
                     </p>
                   </div>
                 </div>
