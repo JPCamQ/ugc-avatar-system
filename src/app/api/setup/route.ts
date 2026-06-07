@@ -1,14 +1,18 @@
 import { NextResponse } from "next/server";
-import { generateAccountSetup } from "@/lib/gemini";
+import { generateAccountSetup } from "@/lib/deepseek";
 import { AvatarIdentity } from "@/lib/db";
 
 export async function POST(request: Request) {
   try {
-    const { avatar, apiKey } = await request.json();
+    const body = await request.json();
+    const { avatar } = body;
 
-    if (!avatar || !apiKey) {
+    const authHeader = request.headers.get("authorization");
+    const apiKey = authHeader ? authHeader.replace("Bearer ", "").trim() : body.apiKey;
+
+    if (!avatar) {
       return NextResponse.json(
-        { error: "Faltan parámetros: avatar y apiKey son requeridos." },
+        { error: "Faltan parámetros requeridos: avatar." },
         { status: 400 }
       );
     }

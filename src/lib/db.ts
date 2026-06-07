@@ -1,7 +1,7 @@
 // Módulo de base de datos en localStorage para el Ecosistema Multi-Avatar UGC
 
 export interface AvatarIdentity {
-  id: string; // ID único
+  id: string; // ID único (ej. milena_basset)
   name: string;
   age: number;
   niche: string;
@@ -14,25 +14,25 @@ export interface AvatarIdentity {
   characterDna: string;
   audioSettings: string;
   videoSettings: string;
-  avatarImage?: string; // Almacenará la imagen en base64
+  avatarImage?: string; // Almacenará la foto en base64 (límite de ~2MB)
 }
 
 export type GrowthPhase = "storytelling" | "value" | "conversion";
 
 export interface PostIdea {
   id: string;
-  avatarId: string; // Clave foránea para asociar al avatar correspondiente
+  avatarId: string; // Clave foránea asociada al avatar
   title: string;
   type: "image" | "carousel" | "video" | "flyer";
   location: string;
-  phase: GrowthPhase; // Fase a la que pertenece esta publicación
+  phase: GrowthPhase; // Para compatibilidad, siempre storytelling
   scenePrompt: string;
   formattedFlowPrompt: string;
   instagramCaption: string;
   status: "draft" | "generated" | "published";
   createdAt: string;
-  productImage?: string; // Imagen del producto de afiliados en base64
-  productName?: string;  // Nombre del producto/marca de afiliados
+  productImage?: string; // Imagen del producto patrocinado en base64
+  productName?: string;  // Nombre del producto o marca patrocinada
 }
 
 export interface ChatMessage {
@@ -52,9 +52,9 @@ export interface ChatSimulation {
   notes?: string;
 }
 
-// Configuración inicial del primer avatar: Milena Basset
+// Configuración inicial del primer avatar: Milena Basset (Lifestyle de Lujo)
 export const DEFAULT_AVATAR: AvatarIdentity = {
-  id: "valeria_cruz", // Mantenemos el ID para no romper la compatibilidad con localStorage existente
+  id: "milena_basset", // ID definitivo para evitar confusión Valeria/Milena
   name: "Milena Basset",
   age: 28,
   niche: "Lifestyle de Lujo, Fitness & Marca Personal de Éxito",

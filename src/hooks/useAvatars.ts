@@ -1,0 +1,287 @@
+import { useState, useEffect, useCallback } from "react";
+import { DEFAULT_AVATAR, AvatarIdentity } from "@/lib/db";
+import { encodeApiKey, decodeApiKey, generateId } from "@/lib/utils";
+
+interface UseAvatarsProps {
+  showSuccess: (msg: string) => void;
+  showError: (msg: string) => void;
+}
+
+const NEW_AVATAR_INITIAL_FORM = {
+  name: "",
+  age: 25,
+  niche: "Fitness & Estilo de Vida",
+  location: "Miami, FL",
+  backstory: "",
+  monetizationLink: "",
+  monetizationProduct: "",
+  toneOfVoice: "Motivador, enérgico, disciplinado.",
+  language: "Español",
+  characterDna: "Photorealistic photograph of a 25-year-old blonde woman in athletic gear.",
+  audioSettings: "ACCENT: Neutral Spanish, energetic diction.\nPAUSES: Natural rhythm.\nMICROPHONE: High-end podcast mic.\nSPEED: Fast and engaging.",
+  videoSettings: "EYE CONTACT: Direct.\nMICRO-EXPRESSIONS: Smiling and dynamic.\nGESTURES: Expressive hand movements."
+};
+
+export function useAvatars({ showSuccess, showError }: UseAvatarsProps) {
+  const [apiKey, setApiKey] = useState("");
+  const [showApiKeyInput, setShowApiKeyInput] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const [avatars, setAvatars] = useState<AvatarIdentity[]>([]);
+  const [selectedAvatarId, setSelectedAvatarId] = useState<string>("");
+  const [currentAvatar, setCurrentAvatar] = useState<AvatarIdentity>(DEFAULT_AVATAR);
+  const [showCreateAvatarModal, setShowCreateAvatarModal] = useState(false);
+  const [isEditingIdentity, setIsEditingIdentity] = useState(false);
+
+  const [newAvatarForm, setNewAvatarForm] = useState<Omit<AvatarIdentity, "id">>(NEW_AVATAR_INITIAL_FORM);
+
+  // Cargar datos iniciales
+  useEffect(() => {
+    // 1. Cargar API Key ofuscada
+    const savedKeyEncoded = localStorage.getItem("deepseek_avatar_api_key_enc");
+    const savedKeyPlain = localStorage.getItem("deepseek_avatar_api_key"); // Legacy
+
+    if (savedKeyEncoded) {
+      setApiKey(decodeApiKey(savedKeyEncoded));
+    } else if (savedKeyPlain && savedKeyPlain.trim() !== "" && savedKeyPlain !== "undefined") {
+      // Migrar key a formato ofuscado y borrar el plano
+      setApiKey(savedKeyPlain);
+      localStorage.setItem("deepseek_avatar_api_key_enc", encodeApiKey(savedKeyPlain));
+      localStorage.removeItem("deepseek_avatar_api_key");
+    } else {
+      setApiKey("");
+      setShowApiKeyInput(true);
+    }
+
+    // 2. Cargar Lista de Avatares
+    const savedAvatarsList = localStorage.getItem("ugc_multi_avatars_list");
+    let loadedAvatars: AvatarIdentity[] = [];
+
+    if (savedAvatarsList) {
+      try {
+        loadedAvatars = JSON.parse(savedAvatarsList);
+        
+        // Corrección de Id Valeria Cruz -> Milena Basset una sola vez sin machacar
+        loadedAvatars = loadedAvatars.map(avatar => {
+          if (avatar.id === "valeria_cruz") {
+            return {
+              ...avatar,
+              id: "milena_basset",
+              // Si el nombre aún era Valeria Cruz, actualizamos al nuevo
+              name: avatar.name === "Valeria Cruz" ? "Milena Basset" : avatar.name
+            };
+          }
+          return avatar;
+        });
+
+        // Si por alguna razón la lista quedó vacía tras un parse fallido
+        if (loadedAvatars.length === 0) {
+          loadedAvatars = [DEFAULT_AVATAR];
+        }
+      } catch (e) {
+        console.error("Error al parsear la lista de avatares:", e);
+        loadedAvatars = [DEFAULT_AVATAR];
+      }
+    } else {
+      loadedAvatars = [DEFAULT_AVATAR];
+    }
+
+    setAvatars(loadedAvatars);
+    localStorage.setItem("ugc_multi_avatars_list", JSON.stringify(loadedAvatars));
+
+    // 3. Cargar Avatar seleccionado
+    let savedSelectedId = localStorage.getItem("ugc_selected_avatar_id");
+    if (savedSelectedId === "valeria_cruz") {
+      savedSelectedId = "milena_basset";
+    }
+
+    const currentId = savedSelectedId && loadedAvatars.some(a => a.id === savedSelectedId)
+      ? savedSelectedId
+      : loadedAvatars[0].id;
+
+    setSelectedAvatarId(currentId);
+    localStorage.setItem("ugc_selected_avatar_id", currentId);
+
+    const foundAvatar = loadedAvatars.find(a => a.id === currentId) || loadedAvatars[0];
+    setCurrentAvatar(foundAvatar);
+  }, []);
+
+  // Cambio de Avatar Seleccionado
+  const handleSelectAvatarChange = useCallback((avatarId: string) => {
+    setSelectedAvatarId(avatarId);
+    localStorage.setItem("ugc_selected_avatar_id", avatarId);
+    
+    setAvatars((prevAvatars) => {
+      const found = prevAvatars.find(a => a.id === avatarId) || prevAvatars[0];
+      setCurrentAvatar(found);
+      return prevAvatars;
+    });
+
+    setIsEditingIdentity(false);
+  }, []);
+
+  // Guardar API Key
+  const handleSaveApiKey = useCallback(() => {
+    const trimmed = apiKey.trim();
+    if (!trimmed || trimmed === "undefined") {
+      showError("Por favor, ingresa una API Key de DeepSeek válida.");
+      return;
+    }
+    localStorage.setItem("deepseek_avatar_api_key_enc", encodeApiKey(trimmed));
+    setApiKey(trimmed);
+    setShowApiKeyInput(false);
+    showSuccess("API Key guardada de forma segura (obfuscada localmente).");
+  }, [apiKey, showError, showSuccess]);
+
+  // Limpiar API Key
+  const handleClearApiKey = useCallback(() => {
+    localStorage.removeItem("deepseek_avatar_api_key_enc");
+    localStorage.removeItem("deepseek_avatar_api_key");
+    setApiKey("");
+    setShowApiKeyInput(true);
+    showSuccess("API Key eliminada del almacenamiento local.");
+  }, [showSuccess]);
+
+  // Subir foto de perfil (base64)
+  const handlePhotoUpload = useCallback((file: File) => {
+    if (file.size > 2 * 1024 * 1024) {
+      showError("La imagen no debe superar los 2MB.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = reader.result as string;
+      setCurrentAvatar((prev) => {
+        const updatedAvatar = { ...prev, avatarImage: base64String };
+        
+        setAvatars((prevAvatars) => {
+          const updatedList = prevAvatars.map(a => a.id === prev.id ? updatedAvatar : a);
+          localStorage.setItem("ugc_multi_avatars_list", JSON.stringify(updatedList));
+          return updatedList;
+        });
+
+        return updatedAvatar;
+      });
+      showSuccess("Foto de avatar cargada con éxito.");
+    };
+    reader.readAsDataURL(file);
+  }, [showError, showSuccess]);
+
+  // Eliminar foto de perfil
+  const handleRemovePhoto = useCallback(() => {
+    setCurrentAvatar((prev) => {
+      const updatedAvatar = { ...prev, avatarImage: undefined };
+      
+      setAvatars((prevAvatars) => {
+        const updatedList = prevAvatars.map(a => a.id === prev.id ? updatedAvatar : a);
+        localStorage.setItem("ugc_multi_avatars_list", JSON.stringify(updatedList));
+        return updatedList;
+      });
+
+      return updatedAvatar;
+    });
+    showSuccess("Foto de avatar eliminada.");
+  }, [showSuccess]);
+
+  // Crear Avatar
+  const handleCreateAvatar = useCallback(() => {
+    if (!newAvatarForm.name.trim()) {
+      showError("Por favor, ingresa un nombre para el nuevo avatar.");
+      return;
+    }
+
+    const newId = `avatar_${generateId()}`;
+    const newAvatar: AvatarIdentity = {
+      ...newAvatarForm,
+      id: newId
+    };
+
+    setAvatars((prevAvatars) => {
+      const updatedList = [...prevAvatars, newAvatar];
+      localStorage.setItem("ugc_multi_avatars_list", JSON.stringify(updatedList));
+      return updatedList;
+    });
+
+    setShowCreateAvatarModal(false);
+    handleSelectAvatarChange(newId);
+    showSuccess(`Avatar '${newAvatar.name}' creado con éxito.`);
+    setNewAvatarForm(NEW_AVATAR_INITIAL_FORM);
+  }, [newAvatarForm, handleSelectAvatarChange, showSuccess, showError]);
+
+  // Eliminar un Avatar
+  const handleDeleteAvatarAction = useCallback((idToDelete: string) => {
+    let fallbackId = "";
+    
+    setAvatars((prevAvatars) => {
+      if (prevAvatars.length <= 1) {
+        showError("Debe haber al menos un avatar en el sistema.");
+        return prevAvatars;
+      }
+
+      const updatedList = prevAvatars.filter(a => a.id !== idToDelete);
+      localStorage.setItem("ugc_multi_avatars_list", JSON.stringify(updatedList));
+
+      // Limpiar datos asociados
+      localStorage.removeItem(`ugc_post_ideas_${idToDelete}`);
+      localStorage.removeItem(`ugc_simulations_${idToDelete}`);
+      localStorage.removeItem(`ugc_setup_${idToDelete}`);
+
+      fallbackId = updatedList[0].id;
+      return updatedList;
+    });
+
+    if (fallbackId) {
+      if (idToDelete === selectedAvatarId) {
+        handleSelectAvatarChange(fallbackId);
+      } else {
+        showSuccess("Avatar eliminado.");
+      }
+    }
+  }, [selectedAvatarId, handleSelectAvatarChange, showError, showSuccess]);
+
+  // Guardar cambios en la identidad
+  const handleSaveIdentity = useCallback(() => {
+    setCurrentAvatar((prev) => {
+      setAvatars((prevAvatars) => {
+        const updatedList = prevAvatars.map(a => a.id === prev.id ? prev : a);
+        localStorage.setItem("ugc_multi_avatars_list", JSON.stringify(updatedList));
+        return updatedList;
+      });
+      return prev;
+    });
+    setIsEditingIdentity(false);
+    showSuccess("Identidad del avatar guardada.");
+  }, [showSuccess]);
+
+  const updateCurrentAvatarField = useCallback((field: keyof AvatarIdentity, value: any) => {
+    setCurrentAvatar((prev) => ({ ...prev, [field]: value }));
+  }, []);
+
+  return {
+    apiKey,
+    setApiKey,
+    showApiKeyInput,
+    setShowApiKeyInput,
+    showPassword,
+    setShowPassword,
+    avatars,
+    selectedAvatarId,
+    currentAvatar,
+    isEditingIdentity,
+    setIsEditingIdentity,
+    showCreateAvatarModal,
+    setShowCreateAvatarModal,
+    newAvatarForm,
+    setNewAvatarForm,
+    handleSelectAvatarChange,
+    handleSaveApiKey,
+    handleClearApiKey,
+    handlePhotoUpload,
+    handleRemovePhoto,
+    handleCreateAvatar,
+    handleDeleteAvatarAction,
+    handleSaveIdentity,
+    updateCurrentAvatarField
+  };
+}

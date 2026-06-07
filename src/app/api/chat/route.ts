@@ -1,14 +1,18 @@
 import { NextResponse } from "next/server";
-import { generateChatResponse } from "@/lib/gemini";
+import { generateChatResponse } from "@/lib/deepseek";
 import { AvatarIdentity, ChatMessage } from "@/lib/db";
 
 export async function POST(request: Request) {
   try {
-    const { avatar, messages, apiKey } = await request.json();
+    const body = await request.json();
+    const { avatar, messages } = body;
 
-    if (!avatar || !messages || !apiKey) {
+    const authHeader = request.headers.get("authorization");
+    const apiKey = authHeader ? authHeader.replace("Bearer ", "").trim() : body.apiKey;
+
+    if (!avatar || !messages) {
       return NextResponse.json(
-        { error: "Faltan parámetros: avatar, messages y apiKey son requeridos." },
+        { error: "Faltan parámetros requeridos: avatar y messages." },
         { status: 400 }
       );
     }

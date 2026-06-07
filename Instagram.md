@@ -1,77 +1,51 @@
-¡Excelente elección de nombre! Milena Basset (@milenabasset) suena moderno, exclusivo, sofisticado y tiene una sonoridad sumamente natural. Además, a nivel de SEO y disponibilidad de marca, es un nombre excelente.
+# 📸 Guía de Optimización de Instagram — Milena Basset
 
-A continuación, tienes la guía profesional de administración seria para gestionar una cuenta de Influencer de IA (Avatar UGC) con éxito y evitar bloqueos algorítmicos.
-
-1. Gestión de Consistencia de Marca (El "Kit de Milena")
-Crea una Carpeta de Semillas (Face Reference): Genera en Flow 3 o 4 retratos de primer plano de Milena con excelente iluminación y expresión neutral. Estas imágenes serán tus "semillas" para inyectar su rostro de forma consistente en cada generación.
-Define su Uniforme Visual: Aunque cambie de ropa, mantén un estilo coherente (ej. tonos tierra, camisas de lino, estilo casual-chic). El cabello debe ser siempre del mismo color, corte y longitud.
-2. Flujo de Trabajo Semanal para Publicaciones
-Para mantener la cuenta activa sin abrumarte, te sugiero un flujo organizado:
-
-Día 1 - Planificación: Usa la pestaña Planificador de nuestra app para generar 5 ideas de la Fase actual (ej. Fase 1: Storytelling).
-Día 2 - Generación Visual: Genera los prompts en Flow de Gemini. Sigue la alerta de Ingredientes Fijos que te da el sistema (ej. si usas una laptop o termo, usa siempre la misma foto de referencia del objeto).
-Día 3 - Copys y Programación: Genera los copys de Instagram en la app.
-3. Automatización del Embudo de Ventas (Conversión Activa)
-El secreto de la monetización de un avatar de IA es el embudo de Mensajes Directos (DMs):
-
-ManyChat (Estándar de la Industria): Conecta la cuenta de Instagram a ManyChat (la plataforma oficial de automatización aprobada por Meta).
-Configura los Triggers de Comentarios: Crea una regla en ManyChat: "Cuando un usuario comente la palabra [CLAVE] en cualquier Reel, enviarle un DM automático".
-El Mensaje en DM: Programa a ManyChat para enviar un mensaje corto y empático (usa el estilo de nuestro Simulador de DMs) que contenga tu enlace de afiliados.
-4. Seguridad de la Cuenta y Algoritmo (Evitar Shadowbans)
-Meta es muy estricto con las cuentas nuevas para evitar spam. Sigue estas reglas estrictas:
-
-Publicación Manual: NO utilices herramientas externas para publicar o programar posts automáticamente a través de la API (como Buffer o Hootsuite) durante los primeros 2 meses. Sube los Reels y carruseles manualmente desde un teléfono móvil.
-Calentamiento de Cuenta (Warm-up): Pasa 10-15 minutos al día interactuando manualmente desde la cuenta de Milena: dale me gusta a cuentas de viajes y finanzas, y responde comentarios reales. Esto le indica a Meta que detrás de la cuenta hay un comportamiento humano real.
-Verificación de 2 Pasos (2FA): Actívala de inmediato en Instagram usando una app como Google Authenticator (nunca uses SMS/número telefónico personal compartido con otras cuentas).
-
-
--------------------
-
-Para optimizar el perfil de Instagram de **Milena Basset** y maximizar la conversión de visitas a seguidores y de seguidores a clics en tu enlace, debemos estructurar dos elementos clave: el **Nombre del Perfil** (que es fundamental para el SEO de búsqueda en Instagram) y la **Biografía (Bio)**.
-
-Aquí tienes la propuesta de optimización profesional basada en embudos de marketing digital:
+Guía profesional para gestionar y escalar la cuenta de Instagram de **Milena Basset** (@milenabasset) con un enfoque en lifestyle de lujo, fitness, marca personal de éxito y monetización orgánica de afiliados (UGC).
 
 ---
 
-### 1. El Campo "Nombre" (SEO de Instagram)
-No pongas solo "Milena Basset". La gente no te buscará por tu nombre al principio, sino por tus temas. Instagram indexa este campo en su buscador.
-* **Propuesta de Nombre SEO:** `Milena Basset | Finanzas & Viajes` o `Milena | Finanzas y Libertad`
+## 1. Kit de Consistencia de Marca (El "Kit de Milena")
+
+- **Consistencia Física (Face Reference):** Genera en Flow 3 o 4 retratos de primer plano de Milena con excelente iluminación, naturalidad y expresión agradable. Utilízalos como referencia consistente para inyectar su rostro en cada Reel, carrusel o historia.
+- **Vestuario y Estilo (Luxury & Gym):** Aunque su ropa sea dinámica y adaptada al clima, mantén su paleta sofisticada (tonos tierra, blazers minimalistas, prendas deportivas elegantes y ropa de gala). Su pelo debe ser siempre pelirrojo natural, con el mismo corte y textura.
+- **Tono de Voz Bilingüe:** Su copy en Instagram es sumamente compacto y directo. Escribe una frase corta y estética en español, una barra vertical `|`, y la misma frase en inglés. Termina con un CTA de interacción casual y 3 hashtags virales.
 
 ---
 
-### 2. Propuestas de Biografía (Bio)
+## 2. Flujo Editorial Semanal
 
-Te presento 3 opciones con enfoques estratégicos según el tono que quieras darle a la cuenta:
+1. **Día 1 - Planificación:** Usa la pestaña **Planificador Editorial** de nuestra app para generar 5 ideas con la API de DeepSeek.
+2. **Día 2 - Estructuración:** Genera el prompt estructurado en la app, copia las tomas/fotos a la plataforma **Flow** y descarga los renders en alta resolución.
+3. **Día 3 - Copys y Redes:** Obtén el caption bilingüe en la app y programa o publica manualmente.
 
-#### Opción 1: Enfoque Coloquial y de Libertad (Recomendada - Estilo Aitana L.)
-*Es fresca, humana y conecta desde la empatía de su transformación personal.*
+---
 
-> 🇨🇴 De un cubículo en Bogotá a recorrer el mundo ✈️
-> 💸 Aprendí a domar mi dinero y mis finanzas
-> 🌴 Te enseño a viajar ahorrando e invirtiendo sin dramas
-> 👇 Arranca hoy y reclama tu bono de $20 USD
+## 3. SEO y Perfil Viral (Instagram Optimization)
+
+### El Campo "Nombre" (SEO de Instagram)
+Instagram indexa las palabras del Nombre en su motor de búsqueda.
+- **Propuesta de Nombre SEO:** `Milena Basset | Lifestyle & Fitness` o `Milena Basset | Luxury Lifestyle`
+
+### Propuestas de Biografía (Bio Magnética)
+
+#### Opción 1: Enfoque Cosmopolita & Libertad (Recomendado)
+> 🇻🇪 Caracas & viajando por el mundo ✈️
+> 🏋️‍♀️ Fitness, alta costura y mentalidad ganadora
+> 💅 Diseñando mi mejor versión día a día
+> 👇 Mi outfit y recomendaciones del día aquí:
 > **[TuLinkDeAfiliado.com]**
 
-#### Opción 2: Enfoque Práctico y Fintech
-*Ideal si quieres posicionarla con más autoridad en el nicho de herramientas financieras.*
-
-> 🌍 Viajando por el mundo con un presupuesto inteligente
-> 📈 Hacks de ahorro, inversión y libertad financiera
-> ❌ Sin rodeos ni tecnicismos aburridos
-> 👇 La app que uso para mis inversiones con un bono de regalo:
-> **[TuLinkDeAfiliado.com]**
-
-#### Opción 3: Enfoque Corto y Minimalista (Estilo Nómada Digital)
-*Muy visual, directa y limpia.*
-
-> 💻 Nómada Digital | hacks de dinero y lifestyle
-> 📌 De deudora en la oficina a viajera a tiempo completo
-> 💰 Te muestro cómo hacer rendir tus ahorros
-> 👇 Regístrate aquí y recibe $20 USD de regalo:
+#### Opción 2: Enfoque Minimalista & Estética
+> ✨ Inspirándote a vivir con abundancia y bienestar
+> 🌴 Lifestyle, moda de lujo y entrenamientos boutique
+> 🇺🇸/🇪🇸 Contenido bilingüe
+> 👇 Explora mis marcas favoritas:
 > **[TuLinkDeAfiliado.com]**
 
 ---
 
-### 3. Consejos de Configuración Final
-1. **Categoría del Perfil:** Selecciónala como **Creador digital** o **Blog personal**. Esto le indica al algoritmo el tipo de cuenta.
-2. **Foto de Perfil:** Utiliza el rostro neutral de tu hoja de expresiones (el de abajo a la derecha), pero agrégale un **borde circular sutil en degradado** (tonos rose/amber de tu paleta) para que resalte mucho más cuando publiques Stories.
+## 4. Seguridad de la Cuenta & Shadowbans
+
+- **Publicación Manual:** Evita programadores externos como Buffer o Hootsuite durante los primeros meses. Publicar de forma manual desde un celular calienta la cuenta de forma natural para Meta.
+- **Warm-up Algorítmico:** Dedica 10 minutos al día a dar likes a cuentas afines de lifestyle y fitness y responde comentarios para mostrar actividad humana.
+- **Autenticación (2FA):** Activa de inmediato la verificación en dos pasos usando una aplicación de autenticación (como Google Authenticator) para proteger el activo de la marca.
