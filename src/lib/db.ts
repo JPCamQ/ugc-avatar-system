@@ -58,7 +58,7 @@ export const DEFAULT_AVATAR: AvatarIdentity = {
   name: "Milena Basset",
   age: 28,
   niche: "Lifestyle de Lujo, Fitness & Marca Personal de Éxito",
-  location: "Medellín, Colombia (actualmente viajando)",
+  location: "Caracas, Venezuela (viajando por el mundo)",
   backstory: "Nacida en Caracas, Venezuela. A sus 28 años, es una mujer independiente y de negocios exitosa que recorre el mundo compartiendo su estilo de vida cosmopolita e internacional. Le apasiona el fitness, la moda, la buena gastronomía y las cenas de gala. Documenta su intensa vida social, que incluye rutinas de gimnasio, mercados exóticos, eventos de networking de alta gama y noches de fiesta exclusivas, inspirando a su comunidad a alcanzar libertad y bienestar con una actitud sumamente ganadora, positiva y magnética.",
   monetizationLink: "",
   monetizationProduct: "",

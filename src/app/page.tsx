@@ -63,7 +63,7 @@ export default function Dashboard() {
   const [captionOutput, setCaptionOutput] = useState("");
   const [promptOutput, setPromptOutput] = useState("");
   const [customContext, setCustomContext] = useState("");
-  const [audioLanguage, setAudioLanguage] = useState<"es" | "en">("es");
+  const [audioLanguage, setAudioLanguage] = useState<"es" | "en" | "silent">("es");
 
   // Simulador de Chats
   const [simulations, setSimulations] = useState<ChatSimulation[]>([]);
@@ -767,7 +767,7 @@ export default function Dashboard() {
     const linkMsg: ChatMessage = {
       id: `msg_link_${Date.now()}`,
       sender: "avatar",
-      text: `¡Hola! Te recomiendo muchísimo visitar el Rooftop 360 en El Poblado, Medellín. Es mi lugar favorito para tomar un café y planear mis proyectos de lifestyle y moda. ¡Te va a encantar! ✨`,
+      text: `¡Hola! Te recomiendo muchísimo visitar el café de autor en Las Mercedes, Caracas. Es mi lugar favorito para tomar un espresso y planear mis proyectos de moda. ¡Te va a encantar! ✨`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
@@ -1655,6 +1655,12 @@ export default function Dashboard() {
                               >
                                 Inglés (Nativo US)
                               </button>
+                              <button
+                                onClick={() => setAudioLanguage("silent")}
+                                className={`px-3 py-1.5 rounded-xl text-[10px] font-bold border transition-all cursor-pointer ${audioLanguage === "silent" ? "bg-rose-50 border-rose-200 text-rose-600 shadow-sm" : "bg-white border-slate-200/50 text-slate-600 hover:bg-slate-50"}`}
+                              >
+                                Sin diálogo (Solo B-Roll)
+                              </button>
                             </div>
                           </div>
                         )}
@@ -2118,7 +2124,7 @@ export default function Dashboard() {
                             <tr className="border-b border-slate-100 hover:bg-slate-50/50">
                               <td className="p-3 text-slate-800 font-semibold">@marcos_fit</td>
                               <td className="p-3 text-slate-500">Santiago</td>
-                              <td className="p-3 text-rose-600 font-semibold">Recomendación de Spot en Medellín</td>
+                              <td className="p-3 text-rose-600 font-semibold">Recomendación de Spot en Caracas</td>
                               <td className="p-3 text-slate-800 font-bold">Fidelizado / Conectado</td>
                               <td className="p-3 text-slate-400 text-right">Hace 1 hora</td>
                             </tr>

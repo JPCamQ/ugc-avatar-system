@@ -84,7 +84,7 @@ Responde ÚNICAMENTE con un arreglo JSON válido de objetos, con la siguiente es
   {
     "title": "Título corto y magnético de la idea",
     "type": "image", "carousel", "video" o "flyer",
-    "location": "Ubicación de la escena (ej. Gimnasio boutique, Rooftop sofisticado en Medellín o Estudio de fotografía en New York)",
+    "location": "Ubicación de la escena (ej. Gimnasio boutique, Rooftop sofisticado en Caracas, o Estudio de fotografía en New York)",
     "description": "Descripción detallada de la escena y el objetivo del post"
   }
 ]
@@ -104,7 +104,7 @@ export async function generatePromptForFlow(
   avatar: AvatarIdentity,
   idea: PostIdea,
   apiKey: string,
-  audioLanguage?: "es" | "en"
+  audioLanguage?: "es" | "en" | "silent"
 ): Promise<string> {
 
   let sceneGuidelines = "";
@@ -116,6 +116,10 @@ SHOT 3: [Detailed description of Shot 3]
 
 CRITICAL CONSISTENCY RULE: Describe a specific, casual OUTFIT/DYNAMIC CLOTHING (highly detailed, including colors, fabric, and garments), hairstyle, lighting, and environment in complete detail inside SHOT 1. For SHOT 2 and SHOT 3, you MUST repeat the exact same detailed description of the outfit, hairstyle, setting, and lighting, but change only the camera angle, shot scale, and physical action/expression of the avatar. Do NOT abbreviate, summarize, or refer back to SHOT 1; every single shot prompt must be fully self-contained so that Flow has all context when processed separately.
 Describe camera movements (mobile phone camera angles, UGC aesthetic) and relaxed physical actions for each shot. Write the labels strictly on new lines so they can be easily parsed. Strictly generate 3 shots maximum.`;
+
+    if (audioLanguage === "silent") {
+      sceneGuidelines += `\n\nCRITICAL SILENT VIDEO RULE: Milena Basset is NOT speaking, looking to speak, or gesticulating words to the camera at any point in any of the shots. She must keep her lips relaxed or smiling naturally, simply walking, posing, looking at the city, looking at a device, or interacting with the environment without any mouth movement related to talking. The video is a purely illustrative B-Roll with no dialogue action.`;
+    }
   } else if (idea.type === "carousel") {
     sceneGuidelines = `The post type is a CAROUSEL of photos. Your task is to structure the DYNAMIC SCENE section in English strictly using the following labeled format:
 PHOTO 1: [Detailed description of Photo 1]
@@ -172,7 +176,7 @@ AUTHENTIC CREATOR: Ultra-realistic beauty portrait photography style, Sony A7R I
 REPEATING INGREDIENTS: [Identify any physical objects that repeat in multiple scenes so the user can upload a consistent reference image in Flow, e.g., "red leather passport, silver laptop". If there are none, write "None".]
 ---
 AUDIO PERFORMANCE:
-${audioLanguage === "en" ? "ACCENT: Native English speaker with a clear, warm, and natural US American accent. Zero foreign or Spanish accent. Authentic native pronunciation.\nPAUSES: Natural rhythm and breathing spaces.\nMICROPHONE: High-quality smartphone vocal note (vibrant, close, authentic).\nSPEED: Dynamic, engaging, and slightly fast, expressing enthusiasm." : avatar.audioSettings}
+${audioLanguage === "silent" ? "AUDIO: No dialogue, no voice, no voiceover. Absolute silence / background ambient sound only. The video is purely illustrative (B-Roll) and Milena Basset is not speaking." : audioLanguage === "en" ? "ACCENT: Native English speaker with a clear, warm, and natural US American accent. Zero foreign or Spanish accent. Authentic native pronunciation.\nPAUSES: Natural rhythm and breathing spaces.\nMICROPHONE: High-quality smartphone vocal note (vibrant, close, authentic).\nSPEED: Dynamic, engaging, and slightly fast, expressing enthusiasm." : avatar.audioSettings}
 VIDEO PERFORMANCE:
 ${avatar.videoSettings}
 
