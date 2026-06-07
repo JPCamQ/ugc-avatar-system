@@ -82,7 +82,8 @@ export async function generatePostIdeas(
 ): Promise<Array<{ title: string; type: "image" | "carousel" | "video" | "flyer"; location: string; description: string }>> {
   
   const contentGuidelines = `El objetivo es documentar la vibrante, activa y cosmopolita vida de ${avatar.name}. Crea ideas que muestren su día a día (rutinas de gimnasio exigentes, cenas sofisticadas, eventos de networking, paseos en mercados locales exclusivos, pasarelas de moda o viajes de lujo).
-REGLA CRÍTICA: Prohibido sugerir u ofrecer herramientas de monetización, links de afiliados, inversiones, bonos de $20 USD, criptomonedas o cualquier venta/promoción comercial. Debe sentirse como una bitácora orgánica de su libertad, bienestar, éxito personal y estilo de vida de lujo. Cero referencias a lamentos del pasado, deudas o cubículos de oficina. ${avatar.name} irradia éxito y energía positiva.`;
+REGLA CRÍTICA PARA POSTS GENERALES (image, video, carousel): Prohibido sugerir u ofrecer herramientas de monetización, links de afiliados, inversiones, bonos de $20 USD, criptomonedas o cualquier venta/promoción comercial en las ideas cotidianas. Debe sentirse como una bitácora orgánica de su libertad, bienestar y estilo de vida.
+REGLA PARA FLYERS (type === "flyer"): Los flyers son de naturaleza comercial. Deben concebirse como anuncios publicitarios o portadas de revistas de moda y negocios de alta gama para promocionar un producto, infoproducto, servicio o marca patrocinada (ej. bolsos de diseñador, fragancias exclusivas, packs de plantillas de prompts de IA, asesorías premium). La descripción debe planificar un enfoque comercial persuasivo: identificar un gancho/dolor de la audiencia, proponer el producto patrocinado como solución, y prever un CTA sutil. Los títulos de los flyers deben ser sumamente magnéticos, cortos e impactantes, emulando portadas de revista o infoproductos virales (ej. "MINDSET DE ÉXITO", "30 HOOKS VIRALES", "EL PODER DEL ESTILO").`;
 
   let customContextInstruction = "";
   if (customContext && customContext.trim()) {
@@ -105,17 +106,21 @@ ${contentGuidelines}
 
 ${customContextInstruction}
 
+REGLAS OBLIGATORIAS DE IDIOMA Y GEOGRAFÍA:
+1. IDIOMA 100% ESPAÑOL: Todos los títulos ("title"), ubicaciones ("location") y descripciones ("description") generados en el JSON DEBEN estar redactados única y exclusivamente en español. Queda terminantemente prohibido usar títulos en inglés (como "Sunset Elegance: Dinner at a Rooftop" o "Sweat & Shine") ni descripciones en inglés. Todo debe ser en español natural, fluido y magnético.
+2. COHERENCIA GEOGRÁFICA: Las escenas cotidianas locales (gimnasios, rooftops, cafés, mercados, calles) DEBEN situarse obligatoriamente en la ubicación actual del avatar: "${avatar.location}". No inventes ni sugieras visitas a Medellín, Colombia u otras ciudades ajenas a su ubicación actual, a menos que el usuario lo solicite explícitamente en el contexto manual para un viaje de turismo internacional. Si la ubicación actual del avatar es "${avatar.location}", entonces la ubicación de las escenas locales debe mencionar "${avatar.location}" (ejemplo: "Gimnasio boutique en ${avatar.location}", "Rooftop sofisticado en ${avatar.location}").
+
 CRÍTICO:
-- La vida de ${avatar.name} es sumamente activa y cosmopolita. Las ideas deben situarse en locaciones como: gimnasios boutique, terrazas de restaurantes de lujo, cenas elegantes, mercados locales exóticos, paseos por ciudades icónicas, estadios, eventos de moda o sesiones de modelaje.
-- Provee una mezcla variada de tipos de publicación: "image" (foto individual), "carousel" (carrusel), "video" (Reel/Video corto) y "flyer" (Flyer publicitario de marca/revista de lujo, donde el avatar modela un producto como perfume, cosmético, bolso, o calzado).
+- La vida de ${avatar.name} es sumamente activa y cosmopolita. Las ideas deben situarse en locaciones locales sofisticadas o eventos de moda.
+- Provee una mezcla variada de tipos de publicación: "image" (foto individual), "carousel" (carrusel), "video" (Reel/Video corto) y "flyer" (Flyer publicitario de marca/revista de lujo, donde el avatar modela un producto).
 
 Responde ÚNICAMENTE con un arreglo JSON válido de objetos, con la siguiente estructura:
 [
   {
-    "title": "Título corto y magnético de la idea",
+    "title": "Título corto y magnético de la idea en español",
     "type": "image" | "carousel" | "video" | "flyer",
-    "location": "Ubicación de la escena (ej. Gimnasio boutique, Rooftop sofisticado en Caracas, o Estudio de fotografía en New York)",
-    "description": "Descripción detallada de la escena y el objetivo del post"
+    "location": "Ubicación detallada de la escena (debe situarse en la ciudad/país de la ubicación actual del avatar, ej. Gimnasio boutique en [Ciudad del avatar])",
+    "description": "Descripción detallada de la escena y el objetivo del post redactada en español"
   }
 ]
 No añadas bloques de código markdown ni texto adicional fuera del JSON.`;
@@ -160,12 +165,23 @@ PHOTO 4: [Detailed description of Photo 4]
 CRITICAL CONSISTENCY RULE: Describe a specific OUTFIT/DYNAMIC CLOTHING (highly detailed, including colors, fabric, and garments), hairstyle, lighting, and setting in complete detail inside PHOTO 1. For PHOTO 2, PHOTO 3, and PHOTO 4, you MUST repeat the exact same detailed description of the outfit, hairstyle, setting, and lighting, but change only the camera angle, shot scale, and physical pose/expression of the avatar. Do NOT abbreviate, summarize, or refer back to PHOTO 1; every single photo prompt must be fully self-contained so that Flow has all context when processed separately.
 Alternate the shot scales, camera angles, and poses to create an organic story. Write the labels strictly on new lines so they can be easily parsed.`;
   } else if (idea.type === "flyer") {
-    sceneGuidelines = `The post type is a luxury commercial ADVERTISING FLYER / MAGAZINE AD (Vogue/business modern aesthetic).
-Your task is to structure the DYNAMIC SCENE section in English describing a stunning layout featuring ${avatar.name} as a professional high-fashion model.
-- Describe a high-fashion, confident, and highly feminine modeling pose (sophisticated, stylish, and magnetically attractive, without being vulgar).
-- Detail the luxury clothing she is wearing (luxury blazer, designer dress, stylish items) suited for representing a high-end brand.
-- Detail the sponsored product packaging (e.g. elegant perfume bottle, cosmetics jar, luxury shoe box, or designer handbag) positioned in the foreground or held elegantly by ${avatar.name}. ${idea.productImage ? "Use the uploaded product image as the main reference for the product's exact shape, label, and colors." : ""}
-- CRITICAL FLYER LAYOUT RULES: Describe the exact placement of clean, legible text on the flyer (e.g., the title "${idea.title}" printed in clean elegant gold serif font at the top). Describe the brand name "${idea.productName || "LUXE"}" written in minimalistic white logo typography in a clean corner. Ensure all text strings are enclosed strictly in double quotes to prevent AI gibberish. The flyer must feel like a premium printed page of a fashion and business magazine.`;
+    sceneGuidelines = `The post type is a luxury commercial ADVERTISING FLYER / MAGAZINE COVER (high-end fashion or modern business editorial aesthetic).
+Your task is to structure the DYNAMIC SCENE section in English describing a stunning layout featuring ${avatar.name} as a professional high-fashion model representing a premium product or service.
+
+COSMETIC & MAKEUP CONSTRAINTS:
+- Keep the avatar's makeup exceptionally clean, minimalist, and natural (strictly avoid heavy digital makeup, thick eyeliner, glossy heavy lipstick, or exaggerated artificial cosmetics that alter her face identity). She must look elegant, raw, and authentic, with natural skin texture, visible pores, and subtle natural makeup.
+
+VISUAL COMPOSITION & LAYOUT:
+- Pose: Describe a professional, confident, and highly feminine high-fashion modeling pose (sophisticated and magnetic, suited for a magazine cover).
+- Outfit: Detail the luxury, stylish clothing she is wearing suited for the theme: "${idea.title}".
+- Sponsored Product: Detail the product "${idea.productName || "LUXE"}" held elegantly by her or placed prominently in the foreground. ${idea.productImage ? "The product must look like an exact 1:1 replica of the uploaded reference image in shape, label, and colors." : ""}
+
+TYPOGRAPHY & COPYWRITING (CRITICAL FOR A FLYER THAT SELLS):
+Based on the theme of "${idea.title}" and the product "${idea.productName || "LUXE"}", you MUST invent and describe the placement of 3 specific, highly professional copy elements written in English (or Spanish if it fits better) on the flyer. All text strings in the prompt must be enclosed strictly in double quotes to prevent AI gibberish.
+1. MAIN HEADLINE (Gancho/Hook): A bold, massive, high-impact headline (e.g. "STOP WAITING.", "PROMPTS PODEROSOS", "30 HOOKS THAT SELL", "THE COIN OF TOMORROW", or "REDEFINE LUXURY"). Describe its typography: either elegant luxury serif (like Vogue Didot style) or bold compact sans-serif, in a clean contrast color (like matte gold, pure white, or deep crimson). Describe its layered placement: "the letters are giant and partially overlap behind the avatar's head and hair to create a professional multi-layered cover effect".
+2. SUBTITLE (Solución/Beneficio): A short, elegant line of selling text under the headline resolving a problem or showing a benefit (e.g. "How to scale your brand in 30 days" or "Style meets high yields").
+3. CTA (Call to Action): A clean, minimalistic call to action placed in a bottom corner or structured badge (e.g. "COMMENT 'GUIDE' TO ACCESS", "LINK IN BIO", or "JOIN THE ELITE").
+4. BRANDING: The brand name "${idea.productName || "LUXE"}" written in small, clean minimalist logo typography in a top corner or bottom corner.`;
   } else {
     sceneGuidelines = `The post type is a single IMAGE. Describe in English a single detailed scene with DYNAMIC CLOTHING (highly detailed, indicating specific style, garment, color, and fit) suited for the location, a warm and authentic expression, and realistic smartphone camera lighting (UGC aesthetic).`;
   }
@@ -173,7 +189,18 @@ Your task is to structure the DYNAMIC SCENE section in English describing a stun
   let productGuideline = "";
   if (idea.productName && idea.type !== "flyer") {
     productGuideline = `PRODUCT INTEGRATION: The avatar must interact naturally with the following product: "${idea.productName}".
-In the DYNAMIC SCENE prompts, include explicit descriptions of where the product is or how she interacts with it (e.g., "holding the ${idea.productName} in her hand with a relaxed smile", "the ${idea.productName} card lies on the wooden desk next to her warm coffee mug", etc.). It must feel like an organic integration of her lifestyle, not an aggressive advertisement.`;
+In the DYNAMIC SCENE prompts, include explicit descriptions of where the product is or how she interacts with it (e.g., "holding the ${idea.productName} in her hand with a relaxed smile", "the ${idea.productName} lies on the table next to her", etc.). It must feel like an organic integration of her lifestyle, not an aggressive advertisement.`;
+  }
+
+  if (idea.productImage) {
+    productGuideline += `\n\nCRITICAL PRODUCT REFERENCE IMAGE RULE (STRICT FIDELITY FOR FLOW):
+A reference image of the product has been uploaded. In the DYNAMIC SCENE prompts, you MUST explicitly instruct the generator to display the product "${idea.productName}" EXACTLY as it appears in the uploaded product reference image. Use instructions like: "the product "${idea.productName}" must be a 1:1 identical visual match to the uploaded product reference image, preserving its exact shape, contours, brand logo, label lettering, and color scheme without any alterations or AI styling. The object must look like a pixel-precise replica of the physical item from the reference image."`;
+  }
+
+  let authenticCreatorStyle = `Ultra-realistic beauty portrait photography style, Sony A7R IV, 85mm macro lens, f/2.0, RAW image quality, hyper-detailed 8K resolution. Macro details showing visible skin texture, real pores, peach fuzz, tiny facial hairs, natural skin grain, soft skin imperfections, realistic iris patterns, natural eyelashes, thick organic eyebrows, realistic eye reflections. Physically accurate lighting with cinematic soft diffusion, realistic color science, luxury skincare campaign aesthetic. Warm and approachable expression, natural and relaxed posture, minimal natural makeup, authentic and raw mobile aesthetic, direct eye contact with the camera. No gibberish text, no garbled letters, no distorted logos, no random symbols in the scene. Negative prompt constraints: cartoon, CGI, 3D render, plastic skin, wax skin, airbrushed skin, over-retouched, artificial pores, fake texture, painting, illustration, low resolution, blurry, uncanny valley, excessive symmetry, skin smoothing, beauty filter.`;
+
+  if (idea.type === "flyer") {
+    authenticCreatorStyle = `High-end commercial editorial magazine photoshoot style, premium fashion photography, raw camera capture, f/2.8 aperture, RAW quality, hyper-detailed 8K resolution. Clear visible skin texture, real pores, realistic skin grain, natural eyelashes, thick organic eyebrows, realistic eye reflections, natural skin complexion. Physically accurate editorial studio lighting or natural outdoor lighting with soft diffusion, realistic color grading. Warm and confident expression, professional relaxed modeling posture, minimal natural makeup, authentic non-airbrushed aesthetic, direct eye contact. No gibberish text on the layout, only the described legible titles, clean margins. Negative prompt constraints: cartoon, CGI, 3D render, plastic skin, wax skin, airbrushed skin, over-retouched skin, artificial face, thick digital makeup, heavy eye shadow, heavy lipstick, fake texture, painting, low resolution, blurry, uncanny valley, skin smoothing filter.`;
   }
 
   const systemPrompt = `Eres un ingeniero de prompts experto en la plataforma "Flow de Gemini".
@@ -188,6 +215,7 @@ DYNAMIC CLOTHING VARIETY:
 - For cold locations (like autumn/winter in New York), use stylish coats, leather jackets, wool sweaters, or scarves.
 - For tropical settings, beaches, or summer environments, use casual summer dresses, tank tops, activewear, or beachwear.
 - For business, office, or formal settings, use smart-casual blazers, stylish blouses, or professional attire.
+- For flyers, use high-fashion elegant clothing, executive blazers, or custom contextual premium attire.
 - CRITICAL: Do NOT default to linen clothing, beige shirts, or neutral linen fabrics unless the user's scene prompt explicitly requests it. Create a diverse, colorful, and modern wardrobe suited for a real lifestyle influencer.
 
 CRITICAL VISUAL CONSTRAINT:
@@ -202,8 +230,9 @@ Debes formatear el resultado exactamente con las siguientes secciones:
 
 HIGH-FIDELITY CHARACTER DNA: Master. ${avatar.characterDna}
 DYNAMIC SCENE: [Escribe aquí la descripción resultante redactada íntegramente en inglés basada en las directrices de arriba, de entre 150 y 250 palabras].
-AUTHENTIC CREATOR: Ultra-realistic beauty portrait photography style, Sony A7R IV, 85mm macro lens, f/2.0, RAW image quality, hyper-detailed 8K resolution. Macro details showing visible skin texture, real pores, peach fuzz, tiny facial hairs, natural skin grain, soft skin imperfections, realistic iris patterns, natural eyelashes, thick organic eyebrows, realistic eye reflections. Physically accurate lighting with cinematic soft diffusion, realistic color science, luxury skincare campaign aesthetic. Warm and approachable expression, natural and relaxed posture, minimal natural makeup, authentic and raw mobile aesthetic, direct eye contact with the camera. No gibberish text, no garbled letters, no distorted logos, no random symbols in the scene. Negative prompt constraints: cartoon, CGI, 3D render, plastic skin, wax skin, airbrushed skin, over-retouched, artificial pores, fake texture, painting, illustration, low resolution, blurry, uncanny valley, excessive symmetry, skin smoothing, beauty filter.
+AUTHENTIC CREATOR: ${authenticCreatorStyle}
 REPEATING INGREDIENTS: [Identify any physical objects that repeat in multiple scenes so the user can upload a consistent reference image in Flow, e.g., "red leather passport, silver laptop". If there are none, write "None".]
+PRODUCT REFERENCE: ${idea.productImage ? `The product "${idea.productName}" must be a 1:1 identical match to the uploaded product reference image. The image generator must extract and copy the exact logo, text label, shape, proportions, and details of the product from the uploaded reference image, rendering it realistically in the scene with zero variations.` : 'None'}
 ---
 AUDIO PERFORMANCE:
 ${audioLanguage === "silent" 
@@ -235,13 +264,37 @@ export async function generateInstagramCaption(
   apiKey: string | undefined
 ): Promise<string> {
 
-  const ctaGuideline = "Pide una interacción muy corta y casual relacionada con el lifestyle, fitness o viajes del post (ej: '¿Cena o gym? 🥂 | Dinner or gym? 🥂', '¿Cuál es tu destino favorito? ✈️ | What's your favorite destination? ✈️'). Prohibido sugerir u ofrecer enlaces de venta, pedir registros, mencionar palabras clave comerciales para enviar DMs (como 'comenta YIELD' o 'comenta BINGO'), prometer bonos de dinero o cualquier promoción comercial. Cero ventas, cero monetización.";
+  let systemPrompt = "";
 
-  const systemPrompt = `Eres ${avatar.name}, un Avatar UGC e Influencer de Inteligencia Artificial enfocado en: ${avatar.niche}.
+  if (idea.type === "flyer") {
+    const productName = idea.productName || "nuestro producto premium";
+    systemPrompt = `Eres ${avatar.name}, un Avatar UGC e Influencer de Inteligencia Artificial enfocado en: ${avatar.niche}.
 Tu historia: ${avatar.backstory}
 Tu tono de voz: ${avatar.toneOfVoice}
 
-Redacta el pie de foto (Caption) de Instagram para la siguiente publicación:
+Redacta el pie de foto (Caption) de Instagram para un FLYER PUBLICITARIO / COMERCIAL de conversión.
+El flyer trata sobre: "${idea.title}"
+La escena es: "${idea.scenePrompt}"
+El producto o marca que promocionamos es: "${productName}"
+
+Instrucciones para el Caption del Flyer Comercial (Conversión & Ventas Premium):
+1. Escribe un caption persuasivo estructurado en 4 partes claras:
+   - GANCHO (Hook): Una pregunta o frase corta de impacto bilingüe (ej: "¿Te cuesta destacar? 🎯 | Struggling to stand out? 🎯") que detenga el scroll.
+   - CUERPO (Problema + Solución): Plantea de forma sumamente ágil e inteligente un problema o deseo de tu audiencia y cómo el producto o servicio "${productName}" lo resuelve con estilo, rendimiento y elegancia. Debe sonar aspiracional y muy profesional.
+   - LLAMADA A LA ACCIÓN (CTA): Pide una acción de conversión directa y sutil en formato bilingüe (ej. "Comenta la palabra clave 'FLYER' y te envío la guía completa por DM 📲 | Comment the keyword 'FLYER' and I'll send you the guide 📲" o "Detalles exclusivos en el enlace de mi biografía | Exclusive details in my bio link 🔗").
+   - OPTIMIZACIÓN SEO: Incorpora orgánicamente palabras clave del nicho (moda, negocios, inteligencia artificial, según el tema) y agrega exactamente 5 hashtags estratégicos del nicho al final.
+2. Mantén el tono sofisticado, enérgico y seguro de ti misma de Milena. No uses promesas de dinero fácil, ni bonos engañosos, ni spam agresivo. Debe sentirse como una recomendación de alta gama.
+3. Extensión: El texto total debe tener entre 35 y 60 palabras. Debe ser conciso pero estructurado y persuasivo.
+
+Devuelve únicamente el copy final sin metadatos.`;
+  } else {
+    const ctaGuideline = "Pide una interacción muy corta y casual relacionada con el lifestyle, fitness o viajes del post (ej: '¿Cena o gym? 🥂 | Dinner or gym? 🥂', '¿Cuál es tu destino favorito? ✈️ | What's your favorite destination? ✈️'). Prohibido sugerir u ofrecer enlaces de venta, pedir registros, mencionar palabras clave comerciales para enviar DMs (como 'comenta YIELD' o 'comenta BINGO'), prometer bonos de dinero o cualquier promoción comercial. Cero ventas, cero monetización.";
+
+    systemPrompt = `Eres ${avatar.name}, un Avatar UGC e Influencer de Inteligencia Artificial enfocado en: ${avatar.niche}.
+Tu historia: ${avatar.backstory}
+Tu tono de voz: ${avatar.toneOfVoice}
+
+Redacta el pie de foto (Caption) de Instagram para la siguiente publicación cotidiana:
 - Título: "${idea.title}"
 - Escena de la imagen/video: "${idea.scenePrompt}"
 
@@ -254,6 +307,7 @@ Instrucciones para el Caption (Estilo Influencer Cosmopolita):
 5. Agrega únicamente 3 hashtags muy virales al final.
 
 Devuelve únicamente el copy final sin metadatos.`;
+  }
 
   try {
     return await callDeepSeek(apiKey, systemPrompt, "Redacta el copy de Instagram.", false);

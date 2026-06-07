@@ -9,6 +9,40 @@ interface UsePostIdeasProps {
   showError: (msg: string) => void;
 }
 
+// Helper para sanitizar y unificar dinámicamente locaciones obsoletas (como Medellín/Colombia) al lugar actual del avatar
+function sanitizeIdeas(ideas: PostIdea[], avatar: AvatarIdentity): { cleaned: PostIdea[]; hasChanges: boolean } {
+  if (!avatar || !avatar.location) return { cleaned: ideas, hasChanges: false };
+  
+  // Extraer ciudad y país del campo location del avatar de forma limpia
+  const parts = avatar.location.split(/[,\/]/);
+  const targetCity = (parts[0] || "Caracas").trim();
+  const targetCountry = (parts[1] || "Venezuela").trim();
+
+  let hasChanges = false;
+  const cleaned = ideas.map(idea => {
+    let updated = { ...idea };
+    const medellinRegex = /Medell[íi]n/gi;
+    const colombiaRegex = /Colombia/gi;
+
+    if (medellinRegex.test(updated.location) || medellinRegex.test(updated.scenePrompt) || medellinRegex.test(updated.title)) {
+      updated.location = updated.location.replace(medellinRegex, targetCity);
+      updated.scenePrompt = updated.scenePrompt.replace(medellinRegex, targetCity);
+      updated.title = updated.title.replace(medellinRegex, targetCity);
+      hasChanges = true;
+    }
+
+    if (colombiaRegex.test(updated.location) || colombiaRegex.test(updated.scenePrompt) || colombiaRegex.test(updated.title)) {
+      updated.location = updated.location.replace(colombiaRegex, targetCountry);
+      updated.scenePrompt = updated.scenePrompt.replace(colombiaRegex, targetCountry);
+      updated.title = updated.title.replace(colombiaRegex, targetCountry);
+      hasChanges = true;
+    }
+    return updated;
+  });
+
+  return { cleaned, hasChanges };
+}
+
 export function usePostIdeas({ currentAvatar, apiKey, showSuccess, showError }: UsePostIdeasProps) {
   const [postIdeas, setPostIdeas] = useState<PostIdea[]>([]);
   const [selectedIdea, setSelectedIdea] = useState<PostIdea | null>(null);
@@ -22,42 +56,22 @@ export function usePostIdeas({ currentAvatar, apiKey, showSuccess, showError }: 
   const [generatingPrompt, setGeneratingPrompt] = useState(false);
   const [generatingCaption, setGeneratingCaption] = useState(false);
 
-  // Recargar ideas al cambiar de avatar
+  // Recargar e higienizar ideas al cambiar de avatar o su locación
   useEffect(() => {
     if (!currentAvatar?.id) return;
     const savedIdeas = localStorage.getItem(`ugc_post_ideas_${currentAvatar.id}`);
     if (savedIdeas) {
       try {
-        let parsedIdeas: PostIdea[] = JSON.parse(savedIdeas);
+        const parsedIdeas: PostIdea[] = JSON.parse(savedIdeas);
         
-        // Sanitización de datos anteriores (Medellín/Colombia -> Caracas/Venezuela)
-        let hasChanges = false;
-        parsedIdeas = parsedIdeas.map(idea => {
-          let updated = { ...idea };
-          const medellinRegex = /Medell[íi]n/gi;
-          const colombiaRegex = /Colombia/gi;
-          
-          if (medellinRegex.test(updated.location) || medellinRegex.test(updated.scenePrompt) || medellinRegex.test(updated.title)) {
-            updated.location = updated.location.replace(medellinRegex, "Caracas");
-            updated.scenePrompt = updated.scenePrompt.replace(medellinRegex, "Caracas");
-            updated.title = updated.title.replace(medellinRegex, "Caracas");
-            hasChanges = true;
-          }
-          
-          if (colombiaRegex.test(updated.location) || colombiaRegex.test(updated.scenePrompt) || colombiaRegex.test(updated.title)) {
-            updated.location = updated.location.replace(colombiaRegex, "Venezuela");
-            updated.scenePrompt = updated.scenePrompt.replace(colombiaRegex, "Venezuela");
-            updated.title = updated.title.replace(colombiaRegex, "Venezuela");
-            hasChanges = true;
-          }
-          return updated;
-        });
+        // Sanitización dinámica de datos anteriores
+        const { cleaned, hasChanges } = sanitizeIdeas(parsedIdeas, currentAvatar);
 
         if (hasChanges) {
-          localStorage.setItem(`ugc_post_ideas_${currentAvatar.id}`, JSON.stringify(parsedIdeas));
+          localStorage.setItem(`ugc_post_ideas_${currentAvatar.id}`, JSON.stringify(cleaned));
         }
 
-        setPostIdeas(parsedIdeas);
+        setPostIdeas(cleaned);
       } catch (e) {
         console.error("Error parsing post ideas:", e);
         setPostIdeas([]);
@@ -69,7 +83,7 @@ export function usePostIdeas({ currentAvatar, apiKey, showSuccess, showError }: 
     setPromptOutput("");
     setCaptionOutput("");
     setPostPromptInput("");
-  }, [currentAvatar?.id]);
+  }, [currentAvatar?.id, currentAvatar?.location]);
 
   // Generar ideas con DeepSeek
   const handleGenerateIdeas = useCallback(async () => {
@@ -91,7 +105,7 @@ export function usePostIdeas({ currentAvatar, apiKey, showSuccess, showError }: 
         throw new Error(data.error || `Error en el servidor (${response.status})`);
       }
 
-      const newIdeas: PostIdea[] = (data.ideas || []).map((idea: any, idx: number) => {
+      const generatedIdeas: PostIdea[] = (data.ideas || []).map((idea: any, idx: number) => {
         let normalizedType: "image" | "carousel" | "video" | "flyer" = "image";
         const rawType = String(idea.type || "").toLowerCase();
         if (rawType.includes("carousel") || rawType.includes("carrusel")) {
@@ -116,8 +130,11 @@ export function usePostIdeas({ currentAvatar, apiKey, showSuccess, showError }: 
         };
       });
 
+      // Sanitizar inmediatamente las ideas recién generadas
+      const { cleaned: sanitizedNewIdeas } = sanitizeIdeas(generatedIdeas, currentAvatar);
+
       setPostIdeas((prev) => {
-        const updatedIdeas = [...newIdeas, ...prev].slice(0, 30); // Aumentamos cupo a 30 posts max
+        const updatedIdeas = [...sanitizedNewIdeas, ...prev].slice(0, 30); // Aumentamos cupo a 30 posts max
         localStorage.setItem(`ugc_post_ideas_${currentAvatar.id}`, JSON.stringify(updatedIdeas));
         return updatedIdeas;
       });

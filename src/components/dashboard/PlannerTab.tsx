@@ -267,6 +267,14 @@ export function PlannerTab({
                     <p className="text-[8px] text-slate-400 mt-1 leading-normal">
                       La IA integrará este producto en los prompts de Flow de forma visualmente realista.
                     </p>
+                    {selectedIdea.productImage && (
+                      <div className="mt-2.5 p-2.5 bg-amber-50/60 border border-amber-200/30 rounded-xl text-[9px] text-amber-900 leading-relaxed flex items-start gap-2 shadow-sm">
+                        <span className="text-amber-600 font-bold text-xs mt-0.5">💡</span>
+                        <div>
+                          <strong>Tip para consistencia en Flow:</strong> Al generar la imagen en Flow, asegúrate de activar la opción de <em>"Object Reference" (o subirla como imagen de apoyo/ControlNet)</em> y subir esta misma foto. El prompt generado ha sido estructurado para forzar al motor de Flow a calcar la forma, logotipos y colores de tu imagen sin distorsiones.
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                 </div>
