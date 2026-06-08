@@ -56,19 +56,43 @@ export function useAvatars({ showSuccess, showError }: UseAvatarsProps) {
     // 2. Cargar Lista de Avatares
     const savedAvatarsList = localStorage.getItem("ugc_multi_avatars_list");
     let loadedAvatars: AvatarIdentity[] = [];
+    let needsSave = false;
 
     if (savedAvatarsList) {
       try {
         loadedAvatars = JSON.parse(savedAvatarsList);
         
-        // Corrección de Id Valeria Cruz -> Milena Basset una sola vez sin machacar
+        // Migración automática de Valeria Cruz o Milena Basset a Milena Reyes
         loadedAvatars = loadedAvatars.map(avatar => {
-          if (avatar.id === "valeria_cruz") {
+          if (avatar.id === "milena_basset" || avatar.id === "valeria_cruz" || avatar.name === "Milena Basset" || avatar.name === "Valeria Cruz") {
+            needsSave = true;
+            const oldId = avatar.id;
+            const newId = "milena_reyes";
+            
+            // Migrar ideas de posts
+            const savedIdeas = localStorage.getItem(`ugc_post_ideas_${oldId}`);
+            if (savedIdeas) {
+              localStorage.setItem(`ugc_post_ideas_${newId}`, savedIdeas);
+              localStorage.removeItem(`ugc_post_ideas_${oldId}`);
+            }
+
+            // Migrar chats/simulaciones
+            const savedSims = localStorage.getItem(`ugc_simulations_${oldId}`);
+            if (savedSims) {
+              localStorage.setItem(`ugc_simulations_${newId}`, savedSims);
+              localStorage.removeItem(`ugc_simulations_${oldId}`);
+            }
+
+            // Migrar setup de cuenta
+            const savedSetup = localStorage.getItem(`ugc_setup_${oldId}`);
+            if (savedSetup) {
+              localStorage.setItem(`ugc_setup_${newId}`, savedSetup);
+              localStorage.removeItem(`ugc_setup_${oldId}`);
+            }
+
             return {
-              ...avatar,
-              id: "milena_basset",
-              // Si el nombre aún era Valeria Cruz, actualizamos al nuevo
-              name: avatar.name === "Valeria Cruz" ? "Milena Basset" : avatar.name
+              ...DEFAULT_AVATAR,
+              id: newId
             };
           }
           return avatar;
@@ -77,22 +101,28 @@ export function useAvatars({ showSuccess, showError }: UseAvatarsProps) {
         // Si por alguna razón la lista quedó vacía tras un parse fallido
         if (loadedAvatars.length === 0) {
           loadedAvatars = [DEFAULT_AVATAR];
+          needsSave = true;
         }
       } catch (e) {
         console.error("Error al parsear la lista de avatares:", e);
         loadedAvatars = [DEFAULT_AVATAR];
+        needsSave = true;
       }
     } else {
       loadedAvatars = [DEFAULT_AVATAR];
+      needsSave = true;
     }
 
     setAvatars(loadedAvatars);
-    localStorage.setItem("ugc_multi_avatars_list", JSON.stringify(loadedAvatars));
+    if (needsSave) {
+      localStorage.setItem("ugc_multi_avatars_list", JSON.stringify(loadedAvatars));
+    }
 
     // 3. Cargar Avatar seleccionado
     let savedSelectedId = localStorage.getItem("ugc_selected_avatar_id");
-    if (savedSelectedId === "valeria_cruz") {
-      savedSelectedId = "milena_basset";
+    if (savedSelectedId === "valeria_cruz" || savedSelectedId === "milena_basset") {
+      savedSelectedId = "milena_reyes";
+      localStorage.setItem("ugc_selected_avatar_id", "milena_reyes");
     }
 
     const currentId = savedSelectedId && loadedAvatars.some(a => a.id === savedSelectedId)

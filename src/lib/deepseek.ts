@@ -200,8 +200,23 @@ A reference image of the product has been uploaded. In the DYNAMIC SCENE prompts
   let authenticCreatorStyle = `Ultra-realistic beauty portrait photography style, Sony A7R IV, 85mm macro lens, f/2.0, RAW image quality, hyper-detailed 8K resolution. Macro details showing visible skin texture, real pores, peach fuzz, tiny facial hairs, natural skin grain, soft skin imperfections, realistic iris patterns, natural eyelashes, thick organic eyebrows, realistic eye reflections. Physically accurate lighting with cinematic soft diffusion, realistic color science, luxury skincare campaign aesthetic. Warm and approachable expression, natural and relaxed posture, minimal natural makeup, authentic and raw mobile aesthetic, direct eye contact with the camera. No gibberish text, no garbled letters, no distorted logos, no random symbols in the scene. Negative prompt constraints: cartoon, CGI, 3D render, plastic skin, wax skin, airbrushed skin, over-retouched, artificial pores, fake texture, painting, illustration, low resolution, blurry, uncanny valley, excessive symmetry, skin smoothing, beauty filter.`;
 
   if (idea.type === "flyer") {
-    authenticCreatorStyle = `High-end commercial editorial magazine photoshoot style, premium fashion photography, raw camera capture, f/2.8 aperture, RAW quality, hyper-detailed 8K resolution. Clear visible skin texture, real pores, realistic skin grain, natural eyelashes, thick organic eyebrows, realistic eye reflections, natural skin complexion. Physically accurate editorial studio lighting or natural outdoor lighting with soft diffusion, realistic color grading. Warm and confident expression, professional relaxed modeling posture, minimal natural makeup, authentic non-airbrushed aesthetic, direct eye contact. No gibberish text on the layout, only the described legible titles, clean margins. Negative prompt constraints: cartoon, CGI, 3D render, plastic skin, wax skin, airbrushed skin, over-retouched skin, artificial face, thick digital makeup, heavy eye shadow, heavy lipstick, fake texture, painting, low resolution, blurry, uncanny valley, skin smoothing filter.`;
+  authenticCreatorStyle = `High-end commercial editorial magazine photoshoot style, premium fashion photography, raw camera capture, f/2.8 aperture, RAW quality, hyper-detailed 8K resolution. Clear visible skin texture, real pores, realistic skin grain, natural eyelashes, thick organic eyebrows, realistic eye reflections, natural skin complexion. Physically accurate editorial studio lighting or natural outdoor lighting with soft diffusion, realistic color grading. Warm and confident expression, professional relaxed modeling posture, minimal natural makeup, authentic non-airbrushed aesthetic, direct eye contact. No gibberish text on the layout, only the described legible titles, clean margins. Negative prompt constraints: cartoon, CGI, 3D render, plastic skin, wax skin, airbrushed skin, over-retouched skin, artificial face, thick digital makeup, heavy eye shadow, heavy lipstick, fake texture, painting, low resolution, blurry, uncanny valley, skin smoothing filter.`;
   }
+
+  const isVideo = idea.type === "video";
+  const videoAudioPromptTemplate = isVideo
+    ? `---
+AUDIO PERFORMANCE:
+${audioLanguage === "silent" 
+    ? "AUDIO: No dialogue, no voice, no voiceover. Absolute silence / background ambient sound only. The video is purely illustrative (B-Roll) and the avatar is not speaking." 
+    : audioLanguage === "voiceover" 
+      ? `AUDIO: Voiceover narration (Voz en off). The avatar is NOT speaking on camera (lips are closed and relaxed), but we hear her voice narrating in the background, describing what she does or the idea she wants to convey. Use the following voice characteristics:\n${avatar.audioSettings}`
+      : audioLanguage === "en" 
+        ? "ACCENT: Native English speaker with a clear, warm, and natural US American accent. Zero foreign or Spanish accent. Authentic native pronunciation.\nPAUSES: Natural rhythm and breathing spaces.\nMICROPHONE: High-quality smartphone vocal note (vibrant, close, authentic).\nSPEED: Dynamic, engaging, and slightly fast, expressing enthusiasm." 
+        : avatar.audioSettings}
+VIDEO PERFORMANCE:
+${avatar.videoSettings}`
+    : "";
 
   const systemPrompt = `Eres un ingeniero de prompts experto en la plataforma "Flow de Gemini".
 Tu tarea es generar un prompt altamente detallado y estructurado de acuerdo a los requerimientos de la plataforma Flow.
@@ -215,8 +230,10 @@ DYNAMIC CLOTHING VARIETY:
 - For cold locations (like autumn/winter in New York), use stylish coats, leather jackets, wool sweaters, or scarves.
 - For tropical settings, beaches, or summer environments, use casual summer dresses, tank tops, activewear, or beachwear.
 - For business, office, or formal settings, use smart-casual blazers, stylish blouses, or professional attire.
-- For flyers, use high-fashion elegant clothing, executive blazers, or custom contextual premium attire.
 - CRITICAL: Do NOT default to linen clothing, beige shirts, or neutral linen fabrics unless the user's scene prompt explicitly requests it. Create a diverse, colorful, and modern wardrobe suited for a real lifestyle influencer.
+
+CRÍTICO DE FORMATO:
+- El tipo de publicación es "${idea.type}". ${isVideo ? "Como es un video, debes incluir obligatoriamente las secciones de AUDIO PERFORMANCE y VIDEO PERFORMANCE descritas abajo." : "Como no es un video, NO debes incluir ninguna sección de audio o video performance; el prompt debe terminar limpiamente en la sección PRODUCT REFERENCE."}
 
 CRITICAL VISUAL CONSTRAINT:
 - Legible and clear text is allowed ONLY when explicitly specified in the prompt. If the scene requires text (e.g., on a paper, sticky note, whiteboard, card, screen, sign, or billboard), specify the exact text clearly in English inside double quotation marks (e.g., showing the text "START NOW").
@@ -230,20 +247,10 @@ Debes formatear el resultado exactamente con las siguientes secciones:
 
 HIGH-FIDELITY CHARACTER DNA: Master. ${avatar.characterDna}
 DYNAMIC SCENE: [Escribe aquí la descripción resultante redactada íntegramente en inglés basada en las directrices de arriba, de entre 150 y 250 palabras].
-AUTHENTIC CREATOR: ${authenticCreatorStyle}
+AUTHENTIC CREATOR: Ultra-realistic beauty portrait photography style, Sony A7R IV, 85mm macro lens, f/2.0, RAW image quality, hyper-detailed 8K resolution. Macro details showing visible skin texture, real pores, peach fuzz, tiny facial hairs, natural skin grain, soft skin imperfections, realistic iris patterns, natural eyelashes, thick organic eyebrows, realistic eye reflections. Physically accurate lighting with cinematic soft diffusion, realistic color science, luxury skincare campaign aesthetic. Warm and approachable expression, natural and relaxed posture, minimal natural makeup, authentic and raw mobile aesthetic, direct eye contact with the camera. No gibberish text, no garbled letters, no distorted logos, no random symbols in the scene. Negative prompt constraints: cartoon, CGI, 3D render, plastic skin, wax skin, airbrushed skin, over-retouched, artificial pores, fake texture, painting, illustration, low resolution, blurry, uncanny valley, excessive symmetry, skin smoothing, beauty filter.
 REPEATING INGREDIENTS: [Identify any physical objects that repeat in multiple scenes so the user can upload a consistent reference image in Flow, e.g., "red leather passport, silver laptop". If there are none, write "None".]
 PRODUCT REFERENCE: ${idea.productImage ? `The product "${idea.productName}" must be a 1:1 identical match to the uploaded product reference image. The image generator must extract and copy the exact logo, text label, shape, proportions, and details of the product from the uploaded reference image, rendering it realistically in the scene with zero variations.` : 'None'}
----
-AUDIO PERFORMANCE:
-${audioLanguage === "silent" 
-    ? "AUDIO: No dialogue, no voice, no voiceover. Absolute silence / background ambient sound only. The video is purely illustrative (B-Roll) and the avatar is not speaking." 
-    : audioLanguage === "voiceover" 
-      ? `AUDIO: Voiceover narration (Voz en off). The avatar is NOT speaking on camera (lips are closed and relaxed), but we hear her voice narrating in the background, describing what she does or the idea she wants to convey. Use the following voice characteristics:\n${avatar.audioSettings}`
-      : audioLanguage === "en" 
-        ? "ACCENT: Native English speaker with a clear, warm, and natural US American accent. Zero foreign or Spanish accent. Authentic native pronunciation.\nPAUSES: Natural rhythm and breathing spaces.\nMICROPHONE: High-quality smartphone vocal note (vibrant, close, authentic).\nSPEED: Dynamic, engaging, and slightly fast, expressing enthusiasm." 
-        : avatar.audioSettings}
-VIDEO PERFORMANCE:
-${avatar.videoSettings}
+${videoAudioPromptTemplate}
 
 Reglas importantes:
 - La sección DYNAMIC SCENE debe estar redactada en inglés (es mejor para los motores generativos visuales) y describir fielmente la escena de viajes/lifestyle solicitada.
@@ -257,60 +264,43 @@ Reglas importantes:
   }
 }
 
-// 3. Generar pie de foto (Caption) para Instagram
+// 3. Generar pie de foto (Caption) para Instagram (Estilo Directo de Milena Reyes)
 export async function generateInstagramCaption(
   avatar: AvatarIdentity,
   idea: PostIdea,
   apiKey: string | undefined
 ): Promise<string> {
 
-  let systemPrompt = "";
+  const systemPrompt = `Eres ${avatar.name}, una Avatar UGC e Influencer de Inteligencia Artificial.
+Tus datos de identidad son:
+- Nombre: ${avatar.name}
+- Nicho: ${avatar.niche}
+- Ubicación actual: ${avatar.location}
+- Historia: ${avatar.backstory}
+- Tono de voz y personalidad: ${avatar.toneOfVoice}
 
-  if (idea.type === "flyer") {
-    const productName = idea.productName || "nuestro producto premium";
-    systemPrompt = `Eres ${avatar.name}, un Avatar UGC e Influencer de Inteligencia Artificial enfocado en: ${avatar.niche}.
-Tu historia: ${avatar.backstory}
-Tu tono de voz: ${avatar.toneOfVoice}
-
-Redacta el pie de foto (Caption) de Instagram para un FLYER PUBLICITARIO / COMERCIAL de conversión.
-El flyer trata sobre: "${idea.title}"
-La escena es: "${idea.scenePrompt}"
-El producto o marca que promocionamos es: "${productName}"
-
-Instrucciones para el Caption del Flyer Comercial (Conversión & Ventas Premium):
-1. Escribe un caption persuasivo estructurado en 4 partes claras:
-   - GANCHO (Hook): Una pregunta o frase corta de impacto bilingüe (ej: "¿Te cuesta destacar? 🎯 | Struggling to stand out? 🎯") que detenga el scroll.
-   - CUERPO (Problema + Solución): Plantea de forma sumamente ágil e inteligente un problema o deseo de tu audiencia y cómo el producto o servicio "${productName}" lo resuelve con estilo, rendimiento y elegancia. Debe sonar aspiracional y muy profesional.
-   - LLAMADA A LA ACCIÓN (CTA): Pide una acción de conversión directa y sutil en formato bilingüe (ej. "Comenta la palabra clave 'FLYER' y te envío la guía completa por DM 📲 | Comment the keyword 'FLYER' and I'll send you the guide 📲" o "Detalles exclusivos en el enlace de mi biografía | Exclusive details in my bio link 🔗").
-   - OPTIMIZACIÓN SEO: Incorpora orgánicamente palabras clave del nicho (moda, negocios, inteligencia artificial, según el tema) y agrega exactamente 5 hashtags estratégicos del nicho al final.
-2. Mantén el tono sofisticado, enérgico y seguro de ti misma de Milena. No uses promesas de dinero fácil, ni bonos engañosos, ni spam agresivo. Debe sentirse como una recomendación de alta gama.
-3. Extensión: El texto total debe tener entre 35 y 60 palabras. Debe ser conciso pero estructurado y persuasivo.
-
-Devuelve únicamente el copy final sin metadatos.`;
-  } else {
-    const ctaGuideline = "Pide una interacción muy corta y casual relacionada con el lifestyle, fitness o viajes del post (ej: '¿Cena o gym? 🥂 | Dinner or gym? 🥂', '¿Cuál es tu destino favorito? ✈️ | What's your favorite destination? ✈️'). Prohibido sugerir u ofrecer enlaces de venta, pedir registros, mencionar palabras clave comerciales para enviar DMs (como 'comenta YIELD' o 'comenta BINGO'), prometer bonos de dinero o cualquier promoción comercial. Cero ventas, cero monetización.";
-
-    systemPrompt = `Eres ${avatar.name}, un Avatar UGC e Influencer de Inteligencia Artificial enfocado en: ${avatar.niche}.
-Tu historia: ${avatar.backstory}
-Tu tono de voz: ${avatar.toneOfVoice}
-
-Redacta el pie de foto (Caption) de Instagram para la siguiente publicación cotidiana:
-- Título: "${idea.title}"
+Redacta el pie de foto (Caption) de Instagram para la siguiente publicación:
+- Título del post: "${idea.title}"
 - Escena de la imagen/video: "${idea.scenePrompt}"
 
-Instrucciones para el Caption (Estilo Influencer Cosmopolita):
-1. El pie de foto debe ser EXTREMADAMENTE CORTO y directo (máximo 5 a 10 palabras en total).
-2. Formato bilingüe obligado: escribe una frase o gancho muy corto en español, seguido de una barra vertical "|" y la misma frase en inglés (ej: "Atardeceres que inspiran ✨ | Sunsets that inspire ✨").
-3. Termina con la llamada a la acción (CTA), también en formato bilingüe y súper compacta:
-   ${ctaGuideline}
-4. NO escribas historias largas, ni sermones de finanzas, ni textos técnicos. Debe verse estético, elegante y muy juvenil.
-5. Agrega únicamente 3 hashtags muy virales al final.
+Instrucciones de formato y estructura (NUEVO ESTILO DIRECTO Y DE ACTITUD):
+1. IDIOMA: Redactado única y exclusivamente en español. Queda totalmente prohibido el formato bilingüe o el uso de la barra vertical "|" para separar español e inglés. El texto principal debe fluir en español natural y con carácter.
+2. ESTRUCTURA CRÍTICA DE 3 BLOQUES (deben estar separados exactamente por una línea en blanco):
+   - LÍNEA 1: Frase de apertura o gancho directo, sin rodeos ni saludos, que obligue a seguir leyendo.
+   
+   - LÍNEA 2-4: Desarrollo corto en 2 o 3 líneas máximo. Concreto, potente, directo al grano y sin explicaciones innecesarias.
+   
+   - LÍNEA FINAL: Cierre con actitud. NO hagas preguntas genéricas del tipo "¿Qué opinas?" o "¿Y tú?". Debe ser una afirmación rotunda, una provocación o un reto con personalidad y seguridad.
+3. ESPACIADO: Deja obligatoriamente una línea en blanco entre cada uno de los 3 bloques principales y el bloque de hashtags.
+4. EMOJIS: Máximo 2 o 3 en todo el post. Nunca los uses como relleno o decoración; úsalos únicamente si aportan significado o fuerza al tono.
+5. HASHTAGS: Añade entre 5 y 8 hashtags virales al final (por ejemplo: #milenareyes #fitness #miami y similares), mezclando español e inglés de forma orgánica.
+6. FILTRADO DE PALABRAS: Queda prohibido usar palabras cursis o clichés como: "amores", "besitos", "chicos", "increíble" (como muletilla) o "manifestar".
+7. REGLA NO COMERCIAL: Prohibido sugerir enlaces de venta, prometer bonos de dinero o realizar CTA comerciales de afiliación.
 
-Devuelve únicamente el copy final sin metadatos.`;
-  }
+Devuelve únicamente el pie de foto final, respetando las líneas en blanco y sin añadir comillas externas ni comentarios aclaratorios.`;
 
   try {
-    return await callDeepSeek(apiKey, systemPrompt, "Redacta el copy de Instagram.", false);
+    return await callDeepSeek(apiKey, systemPrompt, "Redacta el copy de Instagram al nuevo estilo de Milena Reyes.", false);
   } catch (error) {
     console.error("Error generating Instagram caption with DeepSeek:", error);
     throw error;
