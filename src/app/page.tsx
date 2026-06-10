@@ -102,7 +102,8 @@ export default function Page() {
     handleDeleteIdea,
     handleUpdateProductInfo,
     handleSelectIdea,
-    handleUpdateIdeaStatus
+    handleUpdateIdeaStatus,
+    handleUpdatePromptStyle
   } = plannerHook;
 
   // Hook 3: Simulador de Chats DMs
@@ -302,7 +303,7 @@ export default function Page() {
 
       {/* Banner de errores global */}
       {errorMsg && (
-        <div className="max-w-7xl mx-auto w-full px-6 mt-4 font-sans">
+        <div className="max-w-[1600px] mx-auto w-full px-6 mt-4 font-sans">
           <div className="p-4 rounded-xl bg-red-50 border border-red-100 text-red-500 text-xs sm:text-sm font-semibold">
             {errorMsg}
           </div>
@@ -310,7 +311,7 @@ export default function Page() {
       )}
 
       {/* Cuerpo principal del Dashboard */}
-      <main className="relative z-10 flex-1 max-w-7xl mx-auto w-full px-6 py-6 grid grid-cols-1 lg:grid-cols-4 gap-6 items-stretch">
+      <main className="relative z-10 flex-1 max-w-[1600px] mx-auto w-full px-6 py-6 grid grid-cols-1 lg:grid-cols-4 gap-6 items-stretch">
         
         {/* Sidebar izquierdo de perfil y navegación */}
         <AvatarSidebar
@@ -375,6 +376,7 @@ export default function Page() {
                 handleDeleteIdea={handleDeleteIdea}
                 handleUpdateProductInfo={handleUpdateProductInfo}
                 handleSelectIdea={handleSelectIdea}
+                handleUpdatePromptStyle={handleUpdatePromptStyle}
                 copiedText={copiedText}
                 copyToClipboard={copyToClipboard}
                 showError={showError}

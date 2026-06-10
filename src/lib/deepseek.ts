@@ -111,8 +111,9 @@ REGLAS OBLIGATORIAS DE IDIOMA Y GEOGRAFÍA:
 2. COHERENCIA GEOGRÁFICA: Las escenas cotidianas locales (gimnasios, rooftops, cafés, mercados, calles) DEBEN situarse obligatoriamente en la ubicación actual del avatar: "${avatar.location}". No inventes ni sugieras visitas a Medellín, Colombia u otras ciudades ajenas a su ubicación actual, a menos que el usuario lo solicite explícitamente en el contexto manual para un viaje de turismo internacional. Si la ubicación actual del avatar es "${avatar.location}", entonces la ubicación de las escenas locales debe mencionar "${avatar.location}" (ejemplo: "Gimnasio boutique en ${avatar.location}", "Rooftop sofisticado en ${avatar.location}").
 
 CRÍTICO:
-- La vida de ${avatar.name} es sumamente activa y cosmopolita. Las ideas deben situarse en locaciones locales sofisticadas o eventos de moda.
-- Provee una mezcla variada de tipos de publicación: "image" (foto individual), "carousel" (carrusel), "video" (Reel/Video corto) y "flyer" (Flyer publicitario de marca/revista de lujo, donde el avatar modela un producto).
+1. La vida de ${avatar.name} es sumamente activa, saludable y estética. Las ideas deben situarse en locaciones diversas y sofisticadas.
+2. Provee una mezcla variada de tipos de publicación: "image" (foto individual), "carousel" (carrusel), "video" (Reel/Video corto) y "flyer" (Flyer publicitario de marca/revista de lujo, donde el avatar modela un producto).
+3. REGLA DE MÁXIMA VARIEDAD DE ESCENARIOS Y VESTUARIOS: Es OBLIGATORIO que los 5 posts generados tengan locaciones, momentos del día y estilos de vestuario completamente diferentes entre sí. Evita repetir de forma insistente escenas en azoteas (rooftops) o gimnasios. Varía los escenarios: playas de Key Biscayne, parques naturales urbanos, el distrito de diseño (Design District), galerías de arte en Wynwood, interiores de su apartamento minimalista, balcones, yates, puertos, boutiques de alta gama, mercados orgánicos locales, etc. Del mismo modo, planifica vestuarios variados en colores y prendas (ej. vestidos veraniegos de color verde esmeralda o rojo carmesí, blazers elegantes, sudaderas cómodas, ropa de entrenamiento de colores vibrantes, etc.) para que el feed se vea diverso y orgánico.
 
 Responde ÚNICAMENTE con un arreglo JSON válido de objetos, con la siguiente estructura:
 [
@@ -197,11 +198,54 @@ In the DYNAMIC SCENE prompts, include explicit descriptions of where the product
 A reference image of the product has been uploaded. In the DYNAMIC SCENE prompts, you MUST explicitly instruct the generator to display the product "${idea.productName}" EXACTLY as it appears in the uploaded product reference image. Use instructions like: "the product "${idea.productName}" must be a 1:1 identical visual match to the uploaded product reference image, preserving its exact shape, contours, brand logo, label lettering, and color scheme without any alterations or AI styling. The object must look like a pixel-precise replica of the physical item from the reference image."`;
   }
 
-  let authenticCreatorStyle = `Ultra-realistic beauty portrait photography style, Sony A7R IV, 85mm macro lens, f/2.0, RAW image quality, hyper-detailed 8K resolution. Macro details showing visible skin texture, real pores, peach fuzz, tiny facial hairs, natural skin grain, soft skin imperfections, realistic iris patterns, natural eyelashes, thick organic eyebrows, realistic eye reflections. Physically accurate lighting with cinematic soft diffusion, realistic color science, luxury skincare campaign aesthetic. Warm and approachable expression, natural and relaxed posture, minimal natural makeup, authentic and raw mobile aesthetic, direct eye contact with the camera. No gibberish text, no garbled letters, no distorted logos, no random symbols in the scene. Negative prompt constraints: cartoon, CGI, 3D render, plastic skin, wax skin, airbrushed skin, over-retouched, artificial pores, fake texture, painting, illustration, low resolution, blurry, uncanny valley, excessive symmetry, skin smoothing, beauty filter.`;
+  const EDITORIAL_STYLE = `Ultra-realistic photography style, Sony A7R IV, 85mm lens, f/2.0, RAW image quality. Macro details showing visible skin texture, real pores, peach fuzz, natural skin grain, soft skin imperfections, realistic iris patterns, natural eyelashes, thick organic eyebrows, realistic eye reflections. Physically accurate lighting, realistic color science. Natural and relaxed posture, minimal natural makeup, direct eye contact. No gibberish text, no distorted logos. Negative prompt constraints: cartoon, CGI, 3D render, plastic skin, wax skin, airbrushed skin, over-retouched, fake texture, painting, illustration, low resolution, uncanny valley, excessive symmetry, beauty filter.`;
+
+  const UGC_STYLE = `Shot on iPhone 15 Pro Max, wide angle lens, natural light only, no flash. Slightly overexposed. Real skin texture with natural inconsistencies — uneven tone, real pores, slight shine from heat and sun. Hair not perfectly styled — a few strands out of place. Expression relaxed, not composed for a camera. Framing slightly imperfect, subject not perfectly centered. The image looks like something posted to Instagram stories without editing. No studio lighting. No cinematic look. No color science adjustments. Negative prompt constraints: bokeh, blurred background, golden hour, cinematic lighting, soft diffusion, studio lighting, color grading, beauty filter, perfect symmetry, airbrushed skin, plastic skin, 8K, hyper-detailed, Sony camera aesthetic, magazine quality, luxury campaign feel, bare face in formal context, no makeup at events.`;
+
+  const FLYER_STYLE = `High-end commercial editorial magazine photoshoot style, premium fashion photography, raw camera capture, f/2.8 aperture, RAW quality, hyper-detailed 8K resolution. Clear visible skin texture, real pores, realistic skin grain, natural eyelashes, thick organic eyebrows, realistic eye reflections, natural skin complexion. Physically accurate editorial studio lighting or natural outdoor lighting with soft diffusion, realistic color grading. Warm and confident expression, professional relaxed modeling posture, minimal natural makeup, authentic non-airbrushed aesthetic, direct eye contact. No gibberish text on the layout, only the described legible titles, clean margins. Negative prompt constraints: cartoon, CGI, 3D render, plastic skin, wax skin, airbrushed skin, over-retouched skin, artificial face, thick digital makeup, heavy eye shadow, heavy lipstick, fake texture, painting, low resolution, blurry, uncanny valley, skin smoothing filter.`;
+
+  let authenticCreatorStyle = UGC_STYLE;
 
   if (idea.type === "flyer") {
-  authenticCreatorStyle = `High-end commercial editorial magazine photoshoot style, premium fashion photography, raw camera capture, f/2.8 aperture, RAW quality, hyper-detailed 8K resolution. Clear visible skin texture, real pores, realistic skin grain, natural eyelashes, thick organic eyebrows, realistic eye reflections, natural skin complexion. Physically accurate editorial studio lighting or natural outdoor lighting with soft diffusion, realistic color grading. Warm and confident expression, professional relaxed modeling posture, minimal natural makeup, authentic non-airbrushed aesthetic, direct eye contact. No gibberish text on the layout, only the described legible titles, clean margins. Negative prompt constraints: cartoon, CGI, 3D render, plastic skin, wax skin, airbrushed skin, over-retouched skin, artificial face, thick digital makeup, heavy eye shadow, heavy lipstick, fake texture, painting, low resolution, blurry, uncanny valley, skin smoothing filter.`;
+    authenticCreatorStyle = FLYER_STYLE;
+  } else if (idea.promptStyle === "editorial") {
+    authenticCreatorStyle = EDITORIAL_STYLE;
+  } else if (idea.promptStyle === "ugc") {
+    authenticCreatorStyle = UGC_STYLE;
   }
+
+  const MAKEUP_PROTOCOL = `MAKEUP PROTOCOL — Context-adaptive:
+LEVEL 1 / GYM & SPORT: No makeup. Natural face, slight sweat shine, real skin only.
+LEVEL 2 / CASUAL & LIFESTYLE: Minimal makeup — subtle brow definition, light tinted moisturizer, clear lip balm. Looks effortless, not done up.
+LEVEL 3 / GOING OUT & SOCIAL: Natural glam — defined brows, light foundation, soft contour, nude or berry lip, subtle mascara. Polished but not overdone.
+LEVEL 4 / FORMAL & EVENTS: Polished glam — flawless base, soft sculpted contour, defined brows, nude-rose or soft berry lip — NEVER dark red or gothic tones. Defined lashes. Looks powerful but still recognizably Milena.
+Apply the makeup level that matches the scene context automatically. Never leave face bare in formal or social contexts.`;
+
+  const VALIDATED_SCENE_TEMPLATES = `VALIDATED SCENE TEMPLATES (Draw inspiration from these exact validated style guidelines based on the scene context):
+1. CAR / STREET SCENE (UGC, mid-day, outdoor):
+- Outfit: Sleek black sunglasses, off-white ribbed tank top, high-waisted black leggings, thin silver chain necklace.
+- Context/Setting: Inside the driver's seat of a modern SUV parked on Collins Avenue, Miami Beach, FL. Windshield view is sharp and in focus showing traffic, palm trees, buildings, overexposed sky. No bokeh. Natural harsh sunlight.
+- Makeup: Level 2 (Minimal makeup).
+
+2. ROOFTOP DINING / EVENING SCENE (Editorial/UGC, dusk/night, outdoor):
+- Outfit: Fitted black velvet mini dress with long sleeves and a side slit, black strappy heels.
+- Context/Setting: Luxury rooftop terrace in Brickell, Miami, at dusk. Skyline fully visible and lit up in focus. String lights, a small candle on a table, holding a glass of red wine.
+- Makeup: Level 3-4 (Natural or polished glam).
+
+3. GYM WORKOUT SCENE (UGC, indoor, active):
+- Outfit: Black seamless sports bra and matching black leggings. Hair in a messy ponytail or loose bun, wet from sweat.
+- Context/Setting: Sitting on the gym floor, back against a white wall. Gym equipment visible (dumbbells, mats, weight plates). Glistening sweaty skin with natural shine.
+- Makeup: Level 1 (No makeup, real skin).
+
+4. POOL / WATER SCENE (UGC, mid-day, outdoor):
+- Outfit: Simple black one-piece athletic swimsuit. Wet hair slicked back naturally, a few strands on face.
+- Context/Setting: Standing at the edge of a rooftop pool in Miami. Bright harsh sun, hard shadows. Pool water, lane lines, wet concrete deck in focus. No bokeh.
+- Makeup: Level 1 (No makeup).
+
+5. CAFÉ / CASUAL LIFESTYLE (UGC, late morning, indoor):
+- Outfit: Oversized white linen button-up shirt (sleeves rolled up), small gold hoop earrings.
+- Context/Setting: Sitting at a small table inside a modern Miami café. Natural soft light from large window. Holding a ceramic flat white coffee cup. Café interior in focus (tables, people, brick wall, chalkboard menu).
+- Makeup: Level 2 (Minimal makeup).`;
 
   const isVideo = idea.type === "video";
   const videoAudioPromptTemplate = isVideo
@@ -219,18 +263,21 @@ ${avatar.videoSettings}`
     : "";
 
   const systemPrompt = `Eres un ingeniero de prompts experto en la plataforma "Flow de Gemini".
-Tu tarea es generar un prompt altamente detallado y estructurado de acuerdo a los requerimientos de la plataforma Flow.
+Tu tarea es generar un prompt altamente detallado y structured de acuerdo a los requerimientos de la plataforma Flow.
 La escena que debemos describir es: "${idea.title} - ${idea.scenePrompt}". Ubicación: ${idea.location}. Tipo: ${idea.type}.
 
 ${sceneGuidelines}
 ${productGuideline}
+${MAKEUP_PROTOCOL}
+${VALIDATED_SCENE_TEMPLATES}
 
-DYNAMIC CLOTHING VARIETY:
+DYNAMIC CLOTHING VARIETY & SCENE FREEDOM:
+- CRITICAL FREEDOM & DIVERSITY RULE: The 5 validated scene templates provided above are strictly for quality, structure, and level alignment reference. You must NOT copy their exact locations or outfits (like the black dress on a rooftop or the white linen shirt) unless the idea being processed specifically calls for them. Feel 100% free to invent entirely original, fresh, and colorful settings and outfits for every prompt.
 - The avatar's outfit must be highly dynamic, fashionable, and directly match the specific location, weather, and context of the scene.
 - For cold locations (like autumn/winter in New York), use stylish coats, leather jackets, wool sweaters, or scarves.
-- For tropical settings, beaches, or summer environments, use casual summer dresses, tank tops, activewear, or beachwear.
+- For tropical settings, beaches, or summer environments, use colorful casual summer dresses (e.g., in emerald green, royal blue, crimson red), tank tops, activewear, or beachwear.
 - For business, office, or formal settings, use smart-casual blazers, stylish blouses, or professional attire.
-- CRITICAL: Do NOT default to linen clothing, beige shirts, or neutral linen fabrics unless the user's scene prompt explicitly requests it. Create a diverse, colorful, and modern wardrobe suited for a real lifestyle influencer.
+- CRITICAL: Do NOT default to linen clothing, beige shirts, or neutral linen fabrics unless the user's scene prompt explicitly requests it. Create a diverse, colorful, and modern wardrobe suited for a real lifestyle influencer. Keep the settings varied: streets, art districts, balconies, yachts, parks, hotel lobbies. Do not overuse rooftops or black dresses.
 
 CRÍTICO DE FORMATO:
 - El tipo de publicación es "${idea.type}". ${isVideo ? "Como es un video, debes incluir obligatoriamente las secciones de AUDIO PERFORMANCE y VIDEO PERFORMANCE descritas abajo." : "Como no es un video, NO debes incluir ninguna sección de audio o video performance; el prompt debe terminar limpiamente en la sección PRODUCT REFERENCE."}
@@ -246,10 +293,16 @@ REPEATING OBJECTS ANALYSIS:
 Debes formatear el resultado exactamente con las siguientes secciones:
 
 HIGH-FIDELITY CHARACTER DNA: Master. ${avatar.characterDna}
+
+${MAKEUP_PROTOCOL}
+
 DYNAMIC SCENE: [Escribe aquí la descripción resultante redactada íntegramente en inglés basada en las directrices de arriba, de entre 150 y 250 palabras].
-AUTHENTIC CREATOR: Ultra-realistic beauty portrait photography style, Sony A7R IV, 85mm macro lens, f/2.0, RAW image quality, hyper-detailed 8K resolution. Macro details showing visible skin texture, real pores, peach fuzz, tiny facial hairs, natural skin grain, soft skin imperfections, realistic iris patterns, natural eyelashes, thick organic eyebrows, realistic eye reflections. Physically accurate lighting with cinematic soft diffusion, realistic color science, luxury skincare campaign aesthetic. Warm and approachable expression, natural and relaxed posture, minimal natural makeup, authentic and raw mobile aesthetic, direct eye contact with the camera. No gibberish text, no garbled letters, no distorted logos, no random symbols in the scene. Negative prompt constraints: cartoon, CGI, 3D render, plastic skin, wax skin, airbrushed skin, over-retouched, artificial pores, fake texture, painting, illustration, low resolution, blurry, uncanny valley, excessive symmetry, skin smoothing, beauty filter.
+
+AUTHENTIC CREATOR: ${authenticCreatorStyle}
+
 REPEATING INGREDIENTS: [Identify any physical objects that repeat in multiple scenes so the user can upload a consistent reference image in Flow, e.g., "red leather passport, silver laptop". If there are none, write "None".]
-PRODUCT REFERENCE: ${idea.productImage ? `The product "${idea.productName}" must be a 1:1 identical match to the uploaded product reference image. The image generator must extract and copy the exact logo, text label, shape, proportions, and details of the product from the uploaded reference image, rendering it realistically in the scene with zero variations.` : 'None'}
+
+PRODUCT REFERENCE: ${idea.productImage ? `The product "${idea.productName}" must be a 1:1 identical match to the uploaded reference image. The image generator must extract and copy the exact logo, text label, shape, proportions, and details of the product from the uploaded reference image, rendering it realistically in the scene with zero variations.` : 'None'}
 ${videoAudioPromptTemplate}
 
 Reglas importantes:
@@ -318,8 +371,8 @@ Identidad: ${avatar.niche}.
 Historia: ${avatar.backstory}
 Tono de voz: ${avatar.toneOfVoice}
 
-Estás chateando en privado (DMs de Instagram) con un seguidor que admira tu estilo de vida cosmopolita, tus rutinas de gimnasio, tus viajes y tu actitud ganadora.
-Tu objetivo es interactuar de forma sumamente amigable, empática y natural, respondiendo a sus preguntas de lifestyle, fitness, viajes, moda o motivación personal.
+Estás chateando en privado (DMs de Instagram) con un seguidor que admira tu disciplina, tus rutinas de gimnasio, tu estilo de vida en Miami y tu actitud real y fuerte.
+Tu objetivo es interactuar de forma sumamente amigable, empática y natural, respondiendo a sus preguntas de lifestyle, fitness, entrenamientos o motivación personal.
 
 Reglas del chat:
 - Sé natural, de trato cercano y conversacional. 

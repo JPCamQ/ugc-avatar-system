@@ -126,7 +126,8 @@ export function usePostIdeas({ currentAvatar, apiKey, showSuccess, showError }: 
           formattedFlowPrompt: "",
           instagramCaption: "",
           status: "draft",
-          createdAt: new Date().toLocaleDateString()
+          createdAt: new Date().toLocaleDateString(),
+          promptStyle: normalizedType === "flyer" ? "editorial" : "ugc"
         };
       });
 
@@ -345,6 +346,29 @@ export function usePostIdeas({ currentAvatar, apiKey, showSuccess, showError }: 
     showSuccess(`Estado de publicación actualizado a: ${status === "published" ? "Publicado" : status === "generated" ? "Generado" : "Borrador"}`);
   }, [currentAvatar.id, showSuccess]);
 
+  // Actualizar el estilo del prompt del post ("ugc" | "editorial")
+  const handleUpdatePromptStyle = useCallback((ideaId: string, style: "ugc" | "editorial") => {
+    setPostIdeas((prev) => {
+      const updated = prev.map(item => {
+        if (item.id === ideaId) {
+          return { ...item, promptStyle: style };
+        }
+        return item;
+      });
+      localStorage.setItem(`ugc_post_ideas_${currentAvatar.id}`, JSON.stringify(updated));
+      return updated;
+    });
+
+    setSelectedIdea((prev) => {
+      if (prev && prev.id === ideaId) {
+        return { ...prev, promptStyle: style };
+      }
+      return prev;
+    });
+
+    showSuccess(`Estilo del prompt de imagen configurado en: ${style === "ugc" ? "UGC (iPhone)" : "Editorial (Sony)"}`);
+  }, [currentAvatar.id, showSuccess]);
+
   // Seleccionar una idea de post para trabajar
   const handleSelectIdea = useCallback((idea: PostIdea) => {
     setSelectedIdea(idea);
@@ -378,6 +402,7 @@ export function usePostIdeas({ currentAvatar, apiKey, showSuccess, showError }: 
     handleUpdateProductInfo,
     handleUpdateIdeaScenePrompt,
     handleUpdateIdeaStatus,
+    handleUpdatePromptStyle,
     handleSelectIdea
   };
 }

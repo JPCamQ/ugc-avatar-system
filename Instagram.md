@@ -1,51 +1,117 @@
-# 📸 Guía de Optimización de Instagram — Milena Basset
+# 📸 Guía de Estrategia de Instagram — Milena Reyes
 
-Guía profesional para gestionar y escalar la cuenta de Instagram de **Milena Basset** (@milenabasset) con un enfoque en lifestyle de lujo, fitness, marca personal de éxito y monetización orgánica de afiliados (UGC).
-
----
-
-## 1. Kit de Consistencia de Marca (El "Kit de Milena")
-
-- **Consistencia Física (Face Reference):** Genera en Flow 3 o 4 retratos de primer plano de Milena con excelente iluminación, naturalidad y expresión agradable. Utilízalos como referencia consistente para inyectar su rostro en cada Reel, carrusel o historia.
-- **Vestuario y Estilo (Luxury & Gym):** Aunque su ropa sea dinámica y adaptada al clima, mantén su paleta sofisticada (tonos tierra, blazers minimalistas, prendas deportivas elegantes y ropa de gala). Su pelo debe ser siempre pelirrojo natural, con el mismo corte y textura.
-- **Tono de Voz Bilingüe:** Su copy en Instagram es sumamente compacto y directo. Escribe una frase corta y estética en español, una barra vertical `|`, y la misma frase en inglés. Termina con un CTA de interacción casual y 3 hashtags virales.
+Guía profesional para gestionar y escalar la presencia en Instagram de **Milena Reyes** (@milenareyes.ai) bajo la estrategia de **VirtualSoul Agency**.
 
 ---
 
-## 2. Flujo Editorial Semanal
+## 1. Pilares de Contenido
 
-1. **Día 1 - Planificación:** Usa la pestaña **Planificador Editorial** de nuestra app para generar 5 ideas con la API de DeepSeek.
-2. **Día 2 - Estructuración:** Genera el prompt estructurado en la app, copia las tomas/fotos a la plataforma **Flow** y descarga los renders en alta resolución.
-3. **Día 3 - Copys y Redes:** Obtén el caption bilingüe en la app y programa o publica manualmente.
-
----
-
-## 3. SEO y Perfil Viral (Instagram Optimization)
-
-### El Campo "Nombre" (SEO de Instagram)
-Instagram indexa las palabras del Nombre en su motor de búsqueda.
-- **Propuesta de Nombre SEO:** `Milena Basset | Lifestyle & Fitness` o `Milena Basset | Luxury Lifestyle`
-
-### Propuestas de Biografía (Bio Magnética)
-
-#### Opción 1: Enfoque Cosmopolita & Libertad (Recomendado)
-> 🇻🇪 Caracas & viajando por el mundo ✈️
-> 🏋️‍♀️ Fitness, alta costura y mentalidad ganadora
-> 💅 Diseñando mi mejor versión día a día
-> 👇 Mi outfit y recomendaciones del día aquí:
-> **[TuLinkDeAfiliado.com]**
-
-#### Opción 2: Enfoque Minimalista & Estética
-> ✨ Inspirándote a vivir con abundancia y bienestar
-> 🌴 Lifestyle, moda de lujo y entrenamientos boutique
-> 🇺🇸/🇪🇸 Contenido bilingüe
-> 👇 Explora mis marcas favoritas:
-> **[TuLinkDeAfiliado.com]**
+- **40% ENTRENAMIENTO:** Rutinas de ejercicio, estética de gimnasio (gym aesthetic) y progreso físico.
+- **30% LIFESTYLE MIAMI:** Cafeterías, tomas de la ciudad, apartamento, amaneceres.
+- **20% MENTALIDAD:** Reflexiones cortas sobre la disciplina, constancia y el proceso de construcción personal.
+- **10% MARCA PERSONAL:** Contenido de identidad y posicionamiento (quién es Milena).
 
 ---
 
-## 4. Seguridad de la Cuenta & Shadowbans
+## 2. Formatos y Especificaciones Visuales
 
-- **Publicación Manual:** Evita programadores externos como Buffer o Hootsuite durante los primeros meses. Publicar de forma manual desde un celular calienta la cuenta de forma natural para Meta.
-- **Warm-up Algorítmico:** Dedica 10 minutos al día a dar likes a cuentas afines de lifestyle y fitness y responde comentarios para mostrar actividad humana.
-- **Autenticación (2FA):** Activa de inmediato la verificación en dos pasos usando una aplicación de autenticación (como Google Authenticator) para proteger el activo de la marca.
+- **Fotos Individuales:** Retratos, fotos en el gym o lifestyle con ratio 4:5.
+- **Carruseles:** Tips de entrenamiento y reflexiones. Máximo de 7 slides para optimizar retención.
+- **Reels:** Videos dinámicos de 15 a 30 segundos (entrenamiento o recorrido por la ciudad).
+- **Stories:** Contenido casual e interactivo (encuestas, preguntas y respuestas, behind the scenes).
+
+---
+
+## 3. Reglas de Publicación y Frecuencia
+
+- **Frecuencia del Feed:** 1 post al día durante los primeros 30 días para entrenar al algoritmo.
+- **Stories:** Mínimo de 2 stories al día durante la primera semana.
+- **Interacción Activa:** Responder SIEMPRE a todos los comentarios y DMs durante las primeras horas de publicación.
+- **Crecimiento Orgánico:** Queda estrictamente prohibido comprar seguidores. No seguir a más de 10 personas por día durante los primeros 30 días.
+- **Hashtags:** Entre 5 y 8 hashtags por post, mezclando español e inglés.
+
+---
+
+## 4. Estructura de Captions (Copys Cortos en Español)
+
+Los captions deben ser concisos, directos y con actitud:
+
+```text
+LÍNEA 1: Frase de apertura directa (obliga a seguir leyendo).
+LÍNEA 2-4: Desarrollo rápido en 2 o 3 líneas máximo (sin relleno).
+LÍNEA FINAL: Cierre contundente con actitud (afirmación o provocación).
+
+* Separar siempre los bloques con una línea en blanco.
+* Usar un máximo de 2-3 emojis (nunca decorativos ni repetitivos).
+* Colocar los hashtags al final de todo el texto.
+```
+
+---
+
+## 5. Cuadrícula de Contenido (Grid) y Planificación
+
+### Grid Actual (Posts Publicados)
+- **Post 1:** Retrato de presentación (Feed).
+- **Post 2:** Entrenamiento en polea / Gym cable machine (Feed).
+- **Post 3:** Café en Miami (Feed).
+
+### Próximos 6 Posts Programados
+- **Post 4:** Café (Imagen validada - Lifestyle).
+- **Post 5:** Gym floor post-workout (Ángulo desde arriba - Entrenamiento/Mentalidad).
+- **Post 6:** Piscina rooftop (Cuerpo completo en swimsuit - Lifestyle/Fitness).
+- **Post 7:** Rooftop nocturno en Brickell (Vestido negro y copa - Lifestyle).
+- **Post 8:** Conduciendo en Collins Avenue (UGC en SUV - Lifestyle).
+- **Post 9:** Acción en gimnasio (Ejercicios activos - Entrenamiento).
+
+---
+
+## 6. Copys y Captions Listos para Usar
+
+A continuación se presentan los copys preparados para los próximos lanzamientos en el feed:
+
+### Post 5: Gym Floor (Post-Workout)
+```text
+Hay días que no quieres.
+
+Que el gym se siente pesado antes de entrar.
+Que la cama gana el primer round.
+
+Pero vas igual.
+No porque tengas motivación.
+Sino porque ya decidiste quién eres.
+
+Esa es la diferencia.
+
+#disciplina #fitness #mentalidad #milenareyes #gymlife #virtualinfluencer
+```
+
+### Post 4: Café (Cafetería Miami)
+```text
+Miami a las 7am es otra ciudad.
+
+Sin ruido. Solo tú y lo que 
+decidiste construir ese día.
+
+Empieza temprano o empieza tarde.
+Pero empieza.
+
+#miami #lifestyle #morningroutine #milenareyes #virtuallifestyle
+```
+
+### Post 6: Piscina Rooftop
+```text
+El agua no te da energía.
+Te la devuelve.
+
+#miami #rooftop #fitness #milenareyes
+```
+
+### Post 7: Rooftop Nocturno
+```text
+No vine a Miami a sobrevivir.
+
+Vine a construir algo que valga la pena
+cuando nadie está mirando.
+
+#miami #lifestyle #milenareyes #virtualinfluencer
+```

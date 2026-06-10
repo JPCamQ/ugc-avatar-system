@@ -1,7 +1,7 @@
 // Módulo de base de datos en localStorage para el Ecosistema Multi-Avatar UGC
 
 export interface AvatarIdentity {
-  id: string; // ID único (ej. milena_basset)
+  id: string; // ID único (ej. milena_reyes)
   name: string;
   age: number;
   niche: string;
@@ -33,6 +33,7 @@ export interface PostIdea {
   createdAt: string;
   productImage?: string; // Imagen del producto patrocinado en base64
   productName?: string;  // Nombre del producto o marca patrocinada
+  promptStyle?: "ugc" | "editorial"; // Estilo de generación del prompt
 }
 
 export interface ChatMessage {
@@ -64,7 +65,7 @@ export const DEFAULT_AVATAR: AvatarIdentity = {
   monetizationProduct: "",
   toneOfVoice: "SÍ ES: Mujer que construye algo real, que entrena porque lo necesita, que comparte porque le sale natural, no porque quiera likes. Directa, segura, sin relleno. Dice lo que piensa. Palabras clave que usa: disciplina, proceso, construir, intención, real, fuerte. Palabras que nunca usa: 'amores', 'besitos', 'chicos', 'increíble' como muletilla, 'manifestar'. Idioma de contenido: Español principalmente. Inglés en frases clave o posts específicos para audiencia Miami/global.",
   language: "Español con frases clave en inglés",
-  characterDna: `Photorealistic photograph of a 26-year-old Latina woman named Milena Reyes. Venezuelan origin, Miami lifestyle. Natural dark auburn/red wavy hair, medium length. Strong defined eyebrows, light hazel-green eyes, olive skin with natural texture. Athletic and toned physique — not bodybuilder, functional fitness body. High cheekbones, sharp jawline, serious default expression that breaks into confidence, never into forced smiles. Style ranges from performance sportswear to clean casual luxury. Always looks like she owns the room without trying.`,
+  characterDna: `Photorealistic photograph of a 26-year-old Latina woman named Milena Reyes. Venezuelan origin, Miami lifestyle. Natural dark auburn/red wavy hair, medium length. Strong defined eyebrows, light hazel-green eyes, olive skin with natural texture and visible real pores. Athletic and toned physique — not bodybuilder, functional fitness body. High cheekbones, sharp jawline, serious default expression that breaks into confidence, never into forced smiles. Style ranges from performance sportswear to clean casual luxury. Always looks like she owns the room without trying.`,
   audioSettings: `IDIOMA: Español latino neutro con acento venezolano suave. Comprensible para todo LATAM y España.
 TONO: Directa, segura, sin relleno. No dice "chicos" ni "amores". Dice lo que piensa.
 RITMO: Dinámico, pausas intencionales, nunca apresurado.

@@ -54,7 +54,7 @@ export function CreateAvatarModal({
                 type="text"
                 value={newAvatarForm.name}
                 onChange={(e) => setNewAvatarForm({ ...newAvatarForm, name: e.target.value })}
-                placeholder="Ej. Milena Basset"
+                placeholder="Ej. Milena Reyes"
                 className="w-full bg-slate-50 border border-slate-150 rounded-xl px-3.5 py-2 text-xs text-slate-850 focus:outline-none"
               />
             </div>

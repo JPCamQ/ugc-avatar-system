@@ -24,7 +24,7 @@ export function Header({
 }: HeaderProps) {
   return (
     <header className="relative z-10 border-b border-slate-100 bg-white/70 backdrop-blur-md px-6 py-4 font-sans">
-      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div className="max-w-[1600px] mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
         
         {/* Logo y título */}
         <div className="flex items-center gap-3">

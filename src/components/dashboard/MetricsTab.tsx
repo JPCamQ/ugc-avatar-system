@@ -362,7 +362,7 @@ export function MetricsTab({
             Estrategia de Crecimiento & Engagement de Marca Personal
           </h4>
           <p className="text-[10px] text-slate-500 mt-1 leading-relaxed">
-            El avatar de **{currentAvatar.name}** es tu muestra en vivo de la efectividad del contenido de lifestyle y engagement orgánico. Enséñales cómo {currentAvatar.name} planifica su contenido de estilo de vida cosmopolita, genera prompts de video consistentes de 3 tomas para la plataforma Flow de Gemini, e interactúa con su comunidad respondiendo DMs de forma automatizada, natural y bilingüe.
+            El avatar de **{currentAvatar.name}** es tu muestra en vivo de la efectividad del contenido de lifestyle y engagement orgánico. Enséñales cómo {currentAvatar.name} planifica su contenido de fitness y estilo de vida centrado en la disciplina, genera prompts de video consistentes de 3 tomas para la plataforma Flow de Gemini, e interactúa con su comunidad respondiendo DMs de forma automatizada, directa y con actitud.
           </p>
         </div>
       </div>

@@ -49,4 +49,4 @@ Abre [http://localhost:3000](http://localhost:3000) en tu navegador.
 ---
 
 ## 📸 Guías Adicionales
-Revisa [Instagram.md](file:///Instagram.md) para conocer las pautas de optimización viral y consistencia del avatar principal del sistema: **Milena Basset**.
+Revisa [Instagram.md](file:///Instagram.md) para conocer las pautas de optimización viral y consistencia del avatar principal del sistema: **Milena Reyes**.

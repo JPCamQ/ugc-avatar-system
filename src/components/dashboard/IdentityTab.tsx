@@ -58,7 +58,7 @@ export function IdentityTab({
             </div>
             
             <div className="flex gap-2 w-full sm:w-auto justify-end">
-              {avatarsLength > 1 && currentAvatar.id !== "milena_basset" && (
+              {avatarsLength > 1 && currentAvatar.id !== "milena_reyes" && (
                 <button
                   onClick={onDeleteClick}
                   className="px-3 py-1.5 rounded-xl text-xs font-bold text-red-500 bg-red-50 hover:bg-red-100 border border-red-100 transition-all cursor-pointer"

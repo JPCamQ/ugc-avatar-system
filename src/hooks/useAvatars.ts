@@ -62,9 +62,9 @@ export function useAvatars({ showSuccess, showError }: UseAvatarsProps) {
       try {
         loadedAvatars = JSON.parse(savedAvatarsList);
         
-        // Migración automática de Valeria Cruz o Milena Basset a Milena Reyes
         loadedAvatars = loadedAvatars.map(avatar => {
-          if (avatar.id === "milena_basset" || avatar.id === "valeria_cruz" || avatar.name === "Milena Basset" || avatar.name === "Valeria Cruz") {
+          const isOldMilenaReyes = avatar.id === "milena_reyes" && (!avatar.characterDna.includes("visible real pores") || avatar.niche !== "Fitness & Lifestyle");
+          if (avatar.id === "milena_basset" || avatar.id === "valeria_cruz" || avatar.name === "Milena Basset" || avatar.name === "Valeria Cruz" || isOldMilenaReyes) {
             needsSave = true;
             const oldId = avatar.id;
             const newId = "milena_reyes";
@@ -92,7 +92,8 @@ export function useAvatars({ showSuccess, showError }: UseAvatarsProps) {
 
             return {
               ...DEFAULT_AVATAR,
-              id: newId
+              id: newId,
+              avatarImage: avatar.avatarImage // Preservamos la foto cargada por el usuario
             };
           }
           return avatar;
