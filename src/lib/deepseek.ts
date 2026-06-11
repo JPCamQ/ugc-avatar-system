@@ -162,8 +162,11 @@ PHOTO 1: [Detailed description of Photo 1]
 PHOTO 2: [Detailed description of Photo 2]
 PHOTO 3: [Detailed description of Photo 3]
 PHOTO 4: [Detailed description of Photo 4]
+PHOTO 5: [Detailed description of Photo 5]
+PHOTO 6: [Detailed description of Photo 6]
+PHOTO 7: [Detailed description of Photo 7]
 
-CRITICAL CONSISTENCY RULE: Describe a specific OUTFIT/DYNAMIC CLOTHING (highly detailed, including colors, fabric, and garments), hairstyle, lighting, and setting in complete detail inside PHOTO 1. For PHOTO 2, PHOTO 3, and PHOTO 4, you MUST repeat the exact same detailed description of the outfit, hairstyle, setting, and lighting, but change only the camera angle, shot scale, and physical pose/expression of the avatar. Do NOT abbreviate, summarize, or refer back to PHOTO 1; every single photo prompt must be fully self-contained so that Flow has all context when processed separately.
+CRITICAL CONSISTENCY RULE: Describe a specific OUTFIT/DYNAMIC CLOTHING (highly detailed, including colors, fabric, and garments), hairstyle, lighting, and setting in complete detail inside PHOTO 1. For PHOTO 2, PHOTO 3, PHOTO 4, PHOTO 5, PHOTO 6, and PHOTO 7, you MUST repeat the exact same detailed description of the outfit, hairstyle, setting, and lighting, but change only the camera angle, shot scale, and physical pose/expression of the avatar. Do NOT abbreviate, summarize, or refer back to PHOTO 1; every single photo prompt must be fully self-contained so that Flow has all context when processed separately.
 Alternate the shot scales, camera angles, and poses to create an organic story. Write the labels strictly on new lines so they can be easily parsed.`;
   } else if (idea.type === "flyer") {
     sceneGuidelines = `The post type is a luxury commercial ADVERTISING FLYER / MAGAZINE COVER (high-end fashion or modern business editorial aesthetic).
