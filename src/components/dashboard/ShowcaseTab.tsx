@@ -35,6 +35,7 @@ export function ShowcaseTab({
 }: ShowcaseTabProps) {
   const [showcaseData, setShowcaseData] = useState<ShowcaseData | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [selectedGender, setSelectedGender] = useState<"Femenino" | "Masculino">("Femenino");
 
   // Recuperar última muestra guardada localmente
   useEffect(() => {
@@ -59,7 +60,7 @@ export function ShowcaseTab({
       const response = await fetch("/api/showcase/generate", {
         method: "POST",
         headers,
-        body: JSON.stringify({ apiKey })
+        body: JSON.stringify({ apiKey, gender: selectedGender })
       });
 
       const data = await response.json();
@@ -128,15 +129,46 @@ Negative prompt constraints: bokeh, blurred background, golden hour, cinematic l
               </p>
             </div>
             
-            {!isGenerating && (
-              <button
-                onClick={handleGenerateShowcase}
-                className="w-full sm:w-auto px-5 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-purple-600 to-rose-500 text-white hover:from-purple-700 hover:to-rose-600 transition-all cursor-pointer shadow-md shadow-purple-500/10 flex items-center justify-center gap-1.5"
-              >
-                <RefreshCw className="w-3.5 h-3.5" />
-                Generar Muestra Aleatoria
-              </button>
-            )}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+              {/* Selector de Género para Muestra */}
+              <div className="flex items-center bg-slate-100/80 p-1 rounded-xl border border-slate-200/50 self-start sm:self-auto">
+                <button
+                  type="button"
+                  onClick={() => setSelectedGender("Femenino")}
+                  disabled={isGenerating}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    selectedGender === "Femenino"
+                      ? "bg-white text-purple-600 shadow-sm"
+                      : "text-slate-550 hover:text-slate-800"
+                  } disabled:opacity-50`}
+                >
+                  Femenino
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectedGender("Masculino")}
+                  disabled={isGenerating}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    selectedGender === "Masculino"
+                      ? "bg-white text-purple-600 shadow-sm"
+                      : "text-slate-550 hover:text-slate-800"
+                  } disabled:opacity-50`}
+                >
+                  Masculino
+                </button>
+              </div>
+
+              {!isGenerating && (
+                <button
+                  type="button"
+                  onClick={handleGenerateShowcase}
+                  className="px-5 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-purple-600 to-rose-500 text-white hover:from-purple-700 hover:to-rose-600 transition-all cursor-pointer shadow-md shadow-purple-500/10 flex items-center justify-center gap-1.5"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  Generar Muestra
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Estado de Carga */}
