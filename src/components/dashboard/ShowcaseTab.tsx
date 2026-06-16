@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { 
-  Sparkles, RefreshCw, Copy, Check, Instagram, User, Image, FileText, AlertTriangle 
+  Sparkles, RefreshCw, Copy, Check, User, Image, FileText, AlertTriangle 
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { parsePromptSteps } from "@/lib/utils";
@@ -232,7 +232,19 @@ Negative prompt constraints: bokeh, blurred background, golden hour, cinematic l
                   <div>
                     <div className="flex justify-between items-center mb-3">
                       <span className="text-[9px] font-bold text-rose-500 bg-rose-50 px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold border border-rose-100 flex items-center gap-0.5">
-                        <Instagram className="w-3 h-3" />
+                        <svg
+                          className="w-3 h-3"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+                        </svg>
                         Copy Corporativo
                       </span>
                       <button
