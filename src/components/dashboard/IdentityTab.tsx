@@ -1,7 +1,8 @@
 import React from "react";
-import { User, Award } from "lucide-react";
+import { User, Award, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import { AvatarIdentity } from "@/lib/db";
+import { getBasePortraitPrompt } from "@/lib/utils";
 
 interface IdentityTabProps {
   currentAvatar: AvatarIdentity;
@@ -28,6 +29,8 @@ export function IdentityTab({
   avatarsLength,
   openConfirmModal
 }: IdentityTabProps) {
+
+  const basePortraitPrompt = getBasePortraitPrompt(currentAvatar);
 
   const onDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -246,6 +249,33 @@ export function IdentityTab({
               </div>
             </div>
 
+          </div>
+        </div>
+
+        {/* Retrato de ADN (Fijación Base) - Ancho completo */}
+        <div className="mt-6 border-t border-slate-100 pt-6">
+          <div className="bg-slate-50 border border-slate-200/60 rounded-2xl p-5">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-3">
+              <div>
+                <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                  <Sparkles className="w-4 h-4 text-amber-500" />
+                  Prompt Maestro de Retrato de ADN (Fijación Base)
+                </h4>
+                <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed">
+                  <strong>Acción Inicial Obligatoria:</strong> Ejecuta este prompt la primera vez para estabilizar los vectores faciales y de piel de {currentAvatar.name}, sirviendo como la imagen de referencia inmutable.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => copyToClipboard(basePortraitPrompt, "portrait")}
+                className="w-full sm:w-auto text-[10px] text-rose-500 hover:text-rose-600 flex items-center justify-center gap-1 cursor-pointer font-bold bg-white border border-slate-200 px-3.5 py-1.5 rounded-xl shadow-sm hover:shadow transition-all flex-shrink-0"
+              >
+                {copiedText === "portrait" ? "¡Copiado!" : "Copiar Prompt Maestro"}
+              </button>
+            </div>
+            <pre className="w-full bg-slate-900 text-slate-200 rounded-xl p-4 text-[10px] font-mono whitespace-pre-wrap leading-relaxed max-h-48 overflow-y-auto no-scrollbar border border-slate-850">
+              {basePortraitPrompt}
+            </pre>
           </div>
         </div>
 

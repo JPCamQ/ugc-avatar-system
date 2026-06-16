@@ -69,6 +69,7 @@ export default function Page() {
     handlePhotoUpload,
     handleRemovePhoto,
     handleCreateAvatar,
+    isGeneratingAvatar,
     handleDeleteAvatarAction,
     handleSaveIdentity,
     updateCurrentAvatarField
@@ -422,6 +423,7 @@ export default function Page() {
         newAvatarForm={newAvatarForm}
         setNewAvatarForm={setNewAvatarForm}
         handleCreateAvatar={handleCreateAvatar}
+        isGenerating={isGeneratingAvatar}
       />
 
       {/* Confirm Dialog customizado */}

@@ -203,7 +203,8 @@ A reference image of the product has been uploaded. In the DYNAMIC SCENE prompts
 
   const EDITORIAL_STYLE = `Ultra-realistic photography style, Sony A7R IV, 85mm lens, f/2.0, RAW image quality. Macro details showing visible skin texture, real pores, peach fuzz, natural skin grain, soft skin imperfections, realistic iris patterns, natural eyelashes, thick organic eyebrows, realistic eye reflections. Physically accurate lighting, realistic color science. Natural and relaxed posture, minimal natural makeup, direct eye contact. No gibberish text, no distorted logos. Negative prompt constraints: cartoon, CGI, 3D render, plastic skin, wax skin, airbrushed skin, over-retouched, fake texture, painting, illustration, low resolution, uncanny valley, excessive symmetry, beauty filter.`;
 
-  const UGC_STYLE = `Shot on iPhone 15 Pro Max, wide angle lens, natural light only, no flash. Slightly overexposed. Real skin texture with natural inconsistencies — uneven tone, real pores, slight shine from heat and sun. Hair not perfectly styled — a few strands out of place. Expression relaxed, not composed for a camera. Framing slightly imperfect, subject not perfectly centered. The image looks like something posted to Instagram stories without editing. No studio lighting. No cinematic look. No color science adjustments. Negative prompt constraints: bokeh, blurred background, golden hour, cinematic lighting, soft diffusion, studio lighting, color grading, beauty filter, perfect symmetry, airbrushed skin, plastic skin, 8K, hyper-detailed, Sony camera aesthetic, magazine quality, luxury campaign feel, bare face in formal context, no makeup at events.`;
+  const UGC_STYLE = `Shot on iPhone 17 Pro Max, wide angle lens, natural light only, no flash. Slightly overexposed. Real skin texture with natural inconsistencies — uneven tone, Soft makeup, nothing exaggerated, real pores, slight shine from heat and sun. Hair not perfectly styled — a few strands out of place. Expression relaxed, not composed for a camera. Framing slightly imperfect, subject not perfectly centered. The image looks like something posted to Instagram stories without editing. No studio lighting. No cinematic look. No color science adjustments.
+Negative prompt constraints: bokeh, blurred background, golden hour, cinematic lighting, soft diffusion, studio lighting, color grading, beauty filter, perfect symmetry, airbrushed skin, plastic skin, 8K, hyper-detailed, Sony camera aesthetic, magazine quality, luxury campaign feel.`;
 
   const FLYER_STYLE = `High-end commercial editorial magazine photoshoot style, premium fashion photography, raw camera capture, f/2.8 aperture, RAW quality, hyper-detailed 8K resolution. Clear visible skin texture, real pores, realistic skin grain, natural eyelashes, thick organic eyebrows, realistic eye reflections, natural skin complexion. Physically accurate editorial studio lighting or natural outdoor lighting with soft diffusion, realistic color grading. Warm and confident expression, professional relaxed modeling posture, minimal natural makeup, authentic non-airbrushed aesthetic, direct eye contact. No gibberish text on the layout, only the described legible titles, clean margins. Negative prompt constraints: cartoon, CGI, 3D render, plastic skin, wax skin, airbrushed skin, over-retouched skin, artificial face, thick digital makeup, heavy eye shadow, heavy lipstick, fake texture, painting, low resolution, blurry, uncanny valley, skin smoothing filter.`;
 
@@ -221,7 +222,7 @@ A reference image of the product has been uploaded. In the DYNAMIC SCENE prompts
 LEVEL 1 / GYM & SPORT: No makeup. Natural face, slight sweat shine, real skin only.
 LEVEL 2 / CASUAL & LIFESTYLE: Minimal makeup — subtle brow definition, light tinted moisturizer, clear lip balm. Looks effortless, not done up.
 LEVEL 3 / GOING OUT & SOCIAL: Natural glam — defined brows, light foundation, soft contour, nude or berry lip, subtle mascara. Polished but not overdone.
-LEVEL 4 / FORMAL & EVENTS: Polished glam — flawless base, soft sculpted contour, defined brows, nude-rose or soft berry lip — NEVER dark red or gothic tones. Defined lashes. Looks powerful but still recognizably Milena.
+LEVEL 4 / FORMAL & EVENTS: Polished glam — flawless base, soft sculpted contour, defined brows, nude-rose or soft berry lip — NEVER dark red or gothic tones. Defined lashes. Looks powerful but still recognizably the character.
 Apply the makeup level that matches the scene context automatically. Never leave face bare in formal or social contexts.`;
 
   const VALIDATED_SCENE_TEMPLATES = `VALIDATED SCENE TEMPLATES (Draw inspiration from these exact validated style guidelines based on the scene context):
@@ -266,7 +267,7 @@ ${avatar.videoSettings}`
     : "";
 
   const systemPrompt = `Eres un ingeniero de prompts experto en la plataforma "Flow de Gemini".
-Tu tarea es generar un prompt altamente detallado y structured de acuerdo a los requerimientos de la plataforma Flow.
+Tu tarea es generar un prompt altamente detallado y estructurado de acuerdo a los requerimientos de la plataforma Flow.
 La escena que debemos describir es: "${idea.title} - ${idea.scenePrompt}". Ubicación: ${idea.location}. Tipo: ${idea.type}.
 
 ${sceneGuidelines}
@@ -290,16 +291,26 @@ CRITICAL VISUAL CONSTRAINT:
 - Prevent AI gibberish text: Absolutely no garbled text, distorted letters, weird characters, or meaningless symbols are allowed. Ambient backgrounds, buildings, or unrelated items must be kept clean, abstract, or blank with no readable writing.
 - The output images/videos must be ultra-realistic, natural, and raw. Avoid any artificial glossy CGI look, clean renders, or generic AI aesthetics. Focus on raw lighting, high fidelity skin textures, visible skin pores, realistic skin grain, peach fuzz, and natural details.
 
+CRITICAL BACKGROUND & BOKEH CONSTRAINT (UGC MODE):
+- The background MUST ALWAYS BE IN SHARP FOCUS. Never describe a blurry background, bokeh, out of focus elements, depth of field, or soft focus.
+- In the DYNAMIC SCENE section, specify that the background, setting, buildings, street elements, or other people are completely sharp, clear, and in focus. The scene must have no background blur whatsoever.
+
+CRITICAL BRACKET FORMATTING RULE:
+- The DYNAMIC SCENE description MUST be enclosed strictly inside square brackets [ ... ]. For example: "DYNAMIC SCENE: [The avatar is standing...]"
+- The MAKEUP LEVEL TO APPLY section MUST only contain the level identifier inside square brackets, e.g. "MAKEUP LEVEL TO APPLY: [LEVEL 2]". Do not include any descriptions or extra text inside the brackets, just the level code.
+
 REPEATING OBJECTS ANALYSIS:
 - If this is a video or carousel and there are any physical objects (such as a specific coffee mug, fintech card, passport, bag, laptop, phone model, etc.) that repeat across different SHOTs or PHOTOs, identify them. You will list them at the very bottom in a section called "REPEATING INGREDIENTS".
 
 Debes formatear el resultado exactamente con las siguientes secciones:
 
-HIGH-FIDELITY CHARACTER DNA: Master. ${avatar.characterDna}
+HIGH-FIDELITY CHARACTER DNA: [${avatar.characterDna}] Master.
 
 ${MAKEUP_PROTOCOL}
 
-DYNAMIC SCENE: [Escribe aquí la descripción resultante redactada íntegramente en inglés basada en las directrices de arriba, de entre 150 y 250 palabras].
+DYNAMIC SCENE: [Escribe aquí la descripción resultante redactada íntegramente en inglés basada en las directrices de arriba, de entre 150 y 250 palabras. Si es un video o carrusel, redacta los SHOT X / PHOTO X correspondientes. ESTA SECCIÓN DEBE EMPEZAR CON LÓBULO DE CORCHETE '[' Y TERMINAR CON ']'.]
+
+MAKEUP LEVEL TO APPLY: [Determina automáticamente el nivel de maquillaje para esta escena de acuerdo a las pautas y escríbelo aquí estrictamente en formato [LEVEL X], sin textos explicativos adicionales adentro de los corchetes, ej: [LEVEL 1] o [LEVEL 2] o [LEVEL 3] o [LEVEL 4]]
 
 AUTHENTIC CREATOR: ${authenticCreatorStyle}
 
@@ -461,3 +472,86 @@ Responde ÚNICAMENTE con el JSON válido. Sin markdown, sin explicaciones extern
     throw error;
   }
 }
+
+// 6. Expansión de Identidad de Avatar (UGC Avatar Studio v2.0)
+export async function expandAvatarIdentity(
+  gender: string,
+  niche: string,
+  location: string,
+  apiKey: string | undefined
+): Promise<{
+  nombre_completo: string;
+  edad: number;
+  backstory: string;
+  character_dna: string;
+  audio_settings: string;
+  video_performance: string;
+}> {
+  const systemPrompt = `Eres el Arquitecto de Identidades B2B de VirtualSoul Agency. Tu tarea es recibir parámetros mínimos de un nuevo avatar de marca y expandirlos en un perfil de identidad lógico, comercial y de generación técnica sintética.
+
+Debes analizar el Género, el Nicho de mercado, la Raza/Etnia y la Ubicación solicitada para estructurar la psicología, el trasfondo narrativo y las descripciones técnicas en inglés para el motor de imágenes fijas fotorrealistas.
+
+REGLAS ESTRICTAS DE RESPUESTA:
+1. Devuelve EXCLUSIVAMENTE un objeto JSON estructurado con las llaves que se detallan a continuación.
+2. No agregues texto introductorio, explicaciones, ni bloques de código de marcado markdown (como \`\`\`json).
+3. El campo "character_dna" debe redactarse obligatoriamente en INGLÉS y estructurarse como un prompt descriptivo, fotorrealista y denso, enfocándose en texturas de piel reales, imperfecciones y rasgos físicos consistentes.
+
+ESTRUCTURA DEL JSON ESPERADO:
+{
+  "nombre_completo": "Nombre de pila y apellido coherente con la etnia y ubicación",
+  "edad": Número entero entre 24 y 35 (coherente con el nicho comercial),
+  "backstory": "Texto en español. Descripción detallada de dolores pasados, transformación y el objetivo del avatar en las redes sociales. Enfoque narrativo humano y aspiracional.",
+  "character_dna": "Technical English physical prompt description. Must include: ethnicity, detailed hair color, texture and length, eyebrow structure, eye color, specific skin tone and skin imperfections (visible pores, micro-textures), facial structure bone density (jawline, cheekbones), default realistic expression, and initial simple fitted clothing definition.",
+  "audio_settings": "Texto en español. Especificación técnica del idioma, acento geográfico exacto, tono comunicativo (directo, seguro, sin relleno) y modismos prohibidos.",
+  "video_performance": "Texto en español. Instrucciones de lenguaje corporal frente a la cámara, dirección de la mirada, contacto visual fijo y control de gesticulación."
+}`;
+
+  const userPrompt = `DATOS DE ENTRADA PROVISTOS POR LA UI:
+- Género: ${gender}
+- Nicho / Ángulo: ${niche}
+- Raza - Etnia / Ubicación: ${location}`;
+
+  try {
+    const rawText = await callDeepSeek(apiKey, systemPrompt, userPrompt, true);
+    if (!rawText) {
+      throw new Error("La API de DeepSeek devolvió una respuesta vacía.");
+    }
+
+    // Sanitización Estricta (QA Protocol):
+    // Validar que el JSON recibido de la API externa no contenga caracteres de escape rotos que invaliden el renderizado HTML de los bloques de texto.
+    let cleanText = rawText.trim();
+    if (cleanText.startsWith("```")) {
+      cleanText = cleanText.replace(/^```json\s*/i, "").replace(/```$/, "").trim();
+    }
+
+    // Remover caracteres de control no válidos en JSON
+    cleanText = cleanText.replace(/[\u0000-\u001F\u007F-\u009F]/g, "");
+
+    const result = JSON.parse(cleanText);
+
+    // Validar llaves requeridas
+    const requiredKeys = ["nombre_completo", "edad", "backstory", "character_dna", "audio_settings", "video_performance"];
+    for (const key of requiredKeys) {
+      if (!(key in result)) {
+        throw new Error(`La respuesta de la IA no contiene la llave requerida: ${key}`);
+      }
+    }
+
+    // Aislamiento del DNA (QA Protocol):
+    // Comprobar que en el campo character_dna solo se guarde la cadena pura en inglés optimizada, excluyendo los textos fijos de estilo del pipeline.
+    if (result.character_dna) {
+      let dna = String(result.character_dna).trim();
+      dna = dna.replace(/^HIGH-FIDELITY CHARACTER DNA:\s*/gi, "");
+      dna = dna.replace(/^\[/g, "").replace(/\]\s*Master\.?$/gi, "");
+      dna = dna.replace(/Master\.?$/gi, "");
+      dna = dna.trim();
+      result.character_dna = dna;
+    }
+
+    return result;
+  } catch (error: any) {
+    console.error("Error al expandir identidad en deepseek.ts:", error);
+    throw new Error(`Error en el Protocolo QA de Expansión de Identidad: ${error.message}`);
+  }
+}
+

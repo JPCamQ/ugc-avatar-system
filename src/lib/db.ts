@@ -15,6 +15,7 @@ export interface AvatarIdentity {
   audioSettings: string;
   videoSettings: string;
   avatarImage?: string; // Almacenará la foto en base64 (límite de ~2MB)
+  gender?: string; // Género para control de pronombres en fijación base
 }
 
 export type GrowthPhase = "storytelling" | "value" | "conversion";

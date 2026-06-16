@@ -1,25 +1,17 @@
 import { useState, useEffect, useCallback } from "react";
 import { DEFAULT_AVATAR, AvatarIdentity } from "@/lib/db";
 import { encodeApiKey, decodeApiKey, generateId } from "@/lib/utils";
+import { NewAvatarInput } from "@/components/modals/CreateAvatarModal";
 
 interface UseAvatarsProps {
   showSuccess: (msg: string) => void;
   showError: (msg: string) => void;
 }
 
-const NEW_AVATAR_INITIAL_FORM = {
-  name: "",
-  age: 25,
-  niche: "Fitness & Estilo de Vida",
-  location: "Miami, FL",
-  backstory: "",
-  monetizationLink: "",
-  monetizationProduct: "",
-  toneOfVoice: "Motivador, enérgico, disciplinado.",
-  language: "Español",
-  characterDna: "Photorealistic photograph of a 25-year-old blonde woman in athletic gear.",
-  audioSettings: "ACCENT: Neutral Spanish, energetic diction.\nPAUSES: Natural rhythm.\nMICROPHONE: High-end podcast mic.\nSPEED: Fast and engaging.",
-  videoSettings: "EYE CONTACT: Direct.\nMICRO-EXPRESSIONS: Smiling and dynamic.\nGESTURES: Expressive hand movements."
+const NEW_AVATAR_INITIAL_FORM: NewAvatarInput = {
+  gender: "Femenino",
+  niche: "",
+  location: ""
 };
 
 export function useAvatars({ showSuccess, showError }: UseAvatarsProps) {
@@ -32,8 +24,9 @@ export function useAvatars({ showSuccess, showError }: UseAvatarsProps) {
   const [currentAvatar, setCurrentAvatar] = useState<AvatarIdentity>(DEFAULT_AVATAR);
   const [showCreateAvatarModal, setShowCreateAvatarModal] = useState(false);
   const [isEditingIdentity, setIsEditingIdentity] = useState(false);
+  const [isGeneratingAvatar, setIsGeneratingAvatar] = useState(false);
 
-  const [newAvatarForm, setNewAvatarForm] = useState<Omit<AvatarIdentity, "id">>(NEW_AVATAR_INITIAL_FORM);
+  const [newAvatarForm, setNewAvatarForm] = useState<NewAvatarInput>(NEW_AVATAR_INITIAL_FORM);
 
   // Cargar datos iniciales
   useEffect(() => {
@@ -215,30 +208,73 @@ export function useAvatars({ showSuccess, showError }: UseAvatarsProps) {
     showSuccess("Foto de avatar eliminada.");
   }, [showSuccess]);
 
-  // Crear Avatar
-  const handleCreateAvatar = useCallback(() => {
-    if (!newAvatarForm.name.trim()) {
-      showError("Por favor, ingresa un nombre para el nuevo avatar.");
+  // Crear Avatar Asíncrono con Expansión de Identidad por IA
+  const handleCreateAvatar = useCallback(async () => {
+    if (!newAvatarForm.niche.trim() || !newAvatarForm.location.trim()) {
+      showError("Por favor, completa todos los parámetros del avatar.");
       return;
     }
 
-    const newId = `avatar_${generateId()}`;
-    const newAvatar: AvatarIdentity = {
-      ...newAvatarForm,
-      id: newId
-    };
+    setIsGeneratingAvatar(true);
+    try {
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (apiKey) {
+        headers["Authorization"] = `Bearer ${apiKey}`;
+      }
 
-    setAvatars((prevAvatars) => {
-      const updatedList = [...prevAvatars, newAvatar];
-      localStorage.setItem("ugc_multi_avatars_list", JSON.stringify(updatedList));
-      return updatedList;
-    });
+      const response = await fetch("/api/avatar/expand", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          gender: newAvatarForm.gender,
+          niche: newAvatarForm.niche,
+          location: newAvatarForm.location,
+          apiKey
+        })
+      });
 
-    setShowCreateAvatarModal(false);
-    handleSelectAvatarChange(newId);
-    showSuccess(`Avatar '${newAvatar.name}' creado con éxito.`);
-    setNewAvatarForm(NEW_AVATAR_INITIAL_FORM);
-  }, [newAvatarForm, handleSelectAvatarChange, showSuccess, showError]);
+      const data = await response.json();
+      if (!response.ok || data.error) {
+        throw new Error(data.error || `Error en el servidor (${response.status})`);
+      }
+
+      const { expandedData } = data;
+      
+      const newId = `avatar_${generateId()}`;
+      const newAvatar: AvatarIdentity = {
+        id: newId,
+        name: expandedData.nombre_completo,
+        age: expandedData.edad,
+        niche: newAvatarForm.niche,
+        location: newAvatarForm.location,
+        backstory: expandedData.backstory,
+        monetizationProduct: "",
+        monetizationLink: "",
+        toneOfVoice: expandedData.audio_settings, // Mapeamos a toneOfVoice también por compatibilidad
+        language: "Español",
+        characterDna: expandedData.character_dna,
+        audioSettings: expandedData.audio_settings,
+        videoSettings: expandedData.video_performance,
+        gender: newAvatarForm.gender // Guardamos el género seleccionado
+      };
+
+      setAvatars((prevAvatars) => {
+        const updatedList = [...prevAvatars, newAvatar];
+        localStorage.setItem("ugc_multi_avatars_list", JSON.stringify(updatedList));
+        return updatedList;
+      });
+
+      setShowCreateAvatarModal(false);
+      handleSelectAvatarChange(newId);
+      showSuccess(`Avatar '${newAvatar.name}' creado y expandido con éxito.`);
+      setNewAvatarForm(NEW_AVATAR_INITIAL_FORM);
+    } catch (error: any) {
+      console.error(error);
+      showError(error.message || "Error al expandir la identidad del nuevo avatar con IA.");
+    } finally {
+      setIsGeneratingAvatar(false);
+    }
+  }, [newAvatarForm, apiKey, handleSelectAvatarChange, showSuccess, showError]);
 
   // Eliminar un Avatar
   const handleDeleteAvatarAction = useCallback((idToDelete: string) => {
@@ -311,6 +347,7 @@ export function useAvatars({ showSuccess, showError }: UseAvatarsProps) {
     handlePhotoUpload,
     handleRemovePhoto,
     handleCreateAvatar,
+    isGeneratingAvatar,
     handleDeleteAvatarAction,
     handleSaveIdentity,
     updateCurrentAvatarField
