@@ -11,7 +11,8 @@ interface UseAvatarsProps {
 const NEW_AVATAR_INITIAL_FORM: NewAvatarInput = {
   gender: "Femenino",
   niche: "",
-  location: ""
+  location: "",
+  bodyType: "fitness"
 };
 
 export function useAvatars({ showSuccess, showError }: UseAvatarsProps) {
@@ -229,6 +230,7 @@ export function useAvatars({ showSuccess, showError }: UseAvatarsProps) {
           gender: newAvatarForm.gender,
           niche: newAvatarForm.niche,
           location: newAvatarForm.location,
+          bodyType: newAvatarForm.bodyType,
           apiKey
         })
       });
@@ -255,7 +257,8 @@ export function useAvatars({ showSuccess, showError }: UseAvatarsProps) {
         characterDna: expandedData.character_dna,
         audioSettings: expandedData.audio_settings,
         videoSettings: expandedData.video_performance,
-        gender: newAvatarForm.gender // Guardamos el género seleccionado
+        gender: newAvatarForm.gender, // Guardamos el género seleccionado
+        bodyType: newAvatarForm.bodyType // Guardamos la silueta seleccionada
       };
 
       setAvatars((prevAvatars) => {

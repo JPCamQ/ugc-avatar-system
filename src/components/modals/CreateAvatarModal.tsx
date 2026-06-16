@@ -6,6 +6,7 @@ export interface NewAvatarInput {
   gender: string;
   niche: string;
   location: string;
+  bodyType: string;
 }
 
 interface CreateAvatarModalProps {
@@ -93,6 +94,23 @@ export function CreateAvatarModal({
                   <option value="Femenino">Femenino (Mujer / Woman)</option>
                   <option value="Masculino">Masculino (Hombre / Man)</option>
                   <option value="Andrógino">Andrógino / Neutro</option>
+                </select>
+              </div>
+
+              {/* Variable: Silueta / Tipo de Cuerpo */}
+              <div>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1.5 font-semibold tracking-wide">
+                  Silueta / Tipo de Cuerpo
+                </label>
+                <select
+                  value={newAvatarForm.bodyType}
+                  onChange={(e) => setNewAvatarForm({ ...newAvatarForm, bodyType: e.target.value })}
+                  className="w-full bg-slate-50 border border-slate-200/60 rounded-xl px-3.5 py-2 text-xs text-slate-800 focus:outline-none focus:border-rose-450 font-medium transition-all"
+                >
+                  <option value="fitness">Atlético / Fitness (Tonificado)</option>
+                  <option value="voluptuous">Curvilíneo / Voluptuoso (Sensual / Reloj de Arena)</option>
+                  <option value="slim">Esbelto / Delgado</option>
+                  <option value="plus">Curvas Plus / Voluminoso</option>
                 </select>
               </div>
 

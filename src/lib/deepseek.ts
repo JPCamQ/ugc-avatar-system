@@ -266,11 +266,19 @@ VIDEO PERFORMANCE:
 ${avatar.videoSettings}`
     : "";
 
+  const physicalConsistencyGuideline = `
+CRITICAL PHYSICAL VISUAL CONSISTENCY:
+- Carefully read the avatar's HIGH-FIDELITY CHARACTER DNA: [${avatar.characterDna}].
+- Identify if there are any specific, unique visual markers, scars, moles, freckles, hair color patterns, or skin characteristics mentioned (e.g. "a tiny, distinct dark brown mole", "light freckles across the nose", or a specific birthmark).
+- If any such distinctive mark exists, you MUST explicitly describe and repeat this exact same distinctive mark in the same anatomical location in EVERY SINGLE PHOTO or SHOT described in the DYNAMIC SCENE section. Do NOT omit it. This is mandatory to force the image generator to render the feature consistently across all pictures/angles. If the DNA doesn't mention any specific mark, do not force one.
+`;
+
   const systemPrompt = `Eres un ingeniero de prompts experto en la plataforma "Flow de Gemini".
 Tu tarea es generar un prompt altamente detallado y estructurado de acuerdo a los requerimientos de la plataforma Flow.
 La escena que debemos describir es: "${idea.title} - ${idea.scenePrompt}". Ubicación: ${idea.location}. Tipo: ${idea.type}.
 
 ${sceneGuidelines}
+${physicalConsistencyGuideline}
 ${productGuideline}
 ${MAKEUP_PROTOCOL}
 ${VALIDATED_SCENE_TEMPLATES}
@@ -478,7 +486,8 @@ export async function expandAvatarIdentity(
   gender: string,
   niche: string,
   location: string,
-  apiKey: string | undefined
+  apiKey: string | undefined,
+  bodyType: string
 ): Promise<{
   nombre_completo: string;
   edad: number;
@@ -489,19 +498,29 @@ export async function expandAvatarIdentity(
 }> {
   const systemPrompt = `Eres el Arquitecto de Identidades B2B de VirtualSoul Agency. Tu tarea es recibir parámetros mínimos de un nuevo avatar de marca y expandirlos en un perfil de identidad lógico, comercial y de generación técnica sintética.
 
-Debes analizar el Género, el Nicho de mercado, la Raza/Etnia y la Ubicación solicitada para estructurar la psicología, el trasfondo narrativo y las descripciones técnicas en inglés para el motor de imágenes fijas fotorrealistas.
+Debes analizar el Género, el Nicho de mercado, la Raza/Etnia, la Ubicación y la Silueta solicitada para estructurar la psicología, el trasfondo narrativo y las descripciones técnicas en inglés para el motor de imágenes fijas fotorrealistas.
+
+CRITERIOS FÍSICOS DE SILUETA (bodyType) PARA EL CAMPO "character_dna":
+Modelarás estrictamente la silueta del personaje según el tipo de cuerpo elegido:
+- "fitness": Cuerpo atlético y tonificado (functional fitness, athletic, defined toned muscles).
+- "voluptuous": Silueta sumamente voluptuosa y curvilínea con curvas marcadas de reloj de arena, busto prominente y lleno, caderas curvilíneas anchas, muslos gruesos, cintura estrecha y bien definida, y una presencia física altamente sensual y atractiva (estilo modelo latina/sensual tipo @brii_blue2 o @models__ai de Instagram).
+- "slim": Silueta esbelta, delgada y muy estilizada (slim, slender, thin proportions).
+- "plus": Silueta plus size / curvy con volumen corporal prominente y curvas naturales elegantes.
+
+RASGOS FÍSICOS DISTINTIVOS (ANCLA VISUAL OPCIONAL):
+- De forma orgánica e inventiva, puedes incluir en el "character_dna" algún identificador físico sutil y único del personaje (como "a tiny, distinct dark brown mole on her lower left cheek", "a small mole on her right collarbone", o "light freckles across the bridge of her nose") para actuar como firma visual del personaje, pero no lo forces para todos los avatares. Solo agrégalo si encaja bien de forma realista y orgánica.
 
 REGLAS ESTRICTAS DE RESPUESTA:
 1. Devuelve EXCLUSIVAMENTE un objeto JSON estructurado con las llaves que se detallan a continuación.
 2. No agregues texto introductorio, explicaciones, ni bloques de código de marcado markdown (como \`\`\`json).
-3. El campo "character_dna" debe redactarse obligatoriamente en INGLÉS y estructurarse como un prompt descriptivo, fotorrealista y denso, enfocándose en texturas de piel reales, imperfecciones y rasgos físicos consistentes.
+3. El campo "character_dna" debe redactarse obligatoriamente en INGLÉS y estructurarse como un prompt descriptivo, fotorrealista y denso, enfocándose en la silueta indicada, texturas de piel reales, poros visibles, y rasgos físicos consistentes.
 
 ESTRUCTURA DEL JSON ESPERADO:
 {
   "nombre_completo": "Nombre de pila y apellido coherente con la etnia y ubicación",
   "edad": Número entero entre 24 y 35 (coherente con el nicho comercial),
   "backstory": "Texto en español. Descripción detallada de dolores pasados, transformación y el objetivo del avatar en las redes sociales. Enfoque narrativo humano y aspiracional.",
-  "character_dna": "Technical English physical prompt description. Must include: ethnicity, detailed hair color, texture and length, eyebrow structure, eye color, specific skin tone and skin imperfections (visible pores, micro-textures), facial structure bone density (jawline, cheekbones), default realistic expression, and initial simple fitted clothing definition.",
+  "character_dna": "Technical English physical prompt description. Must include: ethnicity, specific body shape / silhouette based on the requested bodyType (detailed curves/measurements style if voluptuous, athletic style if fitness, etc.), detailed hair color, texture and length, eyebrow structure, eye color, specific skin tone and skin imperfections (visible pores, micro-textures, and any optional unique physical marker/mole as visual anchor), facial structure bone density, default realistic expression, and initial clothing definition.",
   "audio_settings": "Texto en español. Especificación técnica del idioma, acento geográfico exacto, tono comunicativo (directo, seguro, sin relleno) y modismos prohibidos.",
   "video_performance": "Texto en español. Instrucciones de lenguaje corporal frente a la cámara, dirección de la mirada, contacto visual fijo y control de gesticulación."
 }`;
@@ -509,7 +528,8 @@ ESTRUCTURA DEL JSON ESPERADO:
   const userPrompt = `DATOS DE ENTRADA PROVISTOS POR LA UI:
 - Género: ${gender}
 - Nicho / Ángulo: ${niche}
-- Raza - Etnia / Ubicación: ${location}`;
+- Raza - Etnia / Ubicación: ${location}
+- Silueta / Tipo de Cuerpo: ${bodyType}`;
 
   try {
     const rawText = await callDeepSeek(apiKey, systemPrompt, userPrompt, true);
@@ -584,10 +604,10 @@ ESTRUCTURA DEL JSON ESPERADO:
   "avatar_info": {
     "nombre": "Nombre y apellido ficticios",
     "detalles": "Ej: 28 años, Origen Italiano, residencia en Barcelona, nicho Lifestyle",
-    "dna_fisico": "Highly detailed physical description in technical English. MUST include ethnicity, hair style/length/color, eye color, sharp facial bone structure, skin texture with visible pores and realistic details, and default expression."
+    "dna_fisico": "Highly detailed physical description in technical English. MUST include ethnicity, hair style/length/color, eye color, sharp facial bone structure, skin texture with visible pores and realistic details, default expression. You are encouraged to invent diverse body shapes (alternating between athletic/fit, slim, and highly voluptuous/curvy hourglass Latin figures with full breasts, wide curvy hips, thick thighs, and defined narrow waist to showcase marketing versatility). Also, you may organically include one subtle unique physical visual marker (such as a specific small mole, light freckles, or birthmark in a specific face/body location) to act as a visual anchor."
   },
   "carrusel_prompts": {
-    "dynamic_scene": "Must contain PHOTO 1, PHOTO 2, PHOTO 3, PHOTO 4, and PHOTO 5 prompts in English. Follow the CRITICAL CONSISTENCY RULE: describe the exact outfit, clothing colors, fabrics, hairstyle, lighting, and environment in full detail in PHOTO 1. Repeat the exact same detailed description in PHOTO 2 to 5, changing ONLY the camera scale (close-up, medium shot, wide shot), camera angle, and physical pose of the avatar. Do not use abbreviations or refer back to PHOTO 1; every photo must be fully self-contained so that Flow has all context when processed separately. Set the location in a beautiful, high-end cosmopolitan environment. The background must be in sharp focus, no bokeh.",
+    "dynamic_scene": "Must contain PHOTO 1, PHOTO 2, PHOTO 3, PHOTO 4, and PHOTO 5 prompts in English. Follow the CRITICAL CONSISTENCY RULE: describe the exact outfit, clothing colors, fabrics, hairstyle, lighting, and environment in full detail in PHOTO 1. Repeat the exact same detailed description in PHOTO 2 to 5, changing ONLY the camera scale (close-up, medium shot, wide shot), camera angle, and physical pose of the avatar. Do not use abbreviations or refer back to PHOTO 1; every photo must be fully self-contained. If you included a specific visual marker/mole in the 'dna_fisico', you MUST repeat that exact marker in the same location in every photo prompt. If you defined a voluptuous/curvy figure, adapt the clothing and poses to highlight the silhouette attractively (e.g., bodycon dresses, tight-fitting luxury activewear, or stylish summer outfits). Set the location in a beautiful, high-end cosmopolitan environment. The background must be in sharp focus, no bokeh.",
     "makeup_level": "LEVEL 2 / CASUAL & LIFESTYLE" or "LEVEL 3 / GOING OUT & SOCIAL"
   },
   "instagram_caption": "Copy de ventas persuasivo redactado en español para el Instagram de nuestra agencia (VirtualSoul Agency). Debe destacar la calidad fotorrealista y la consistencia del avatar de muestra generado. Incluye un gancho inicial de alto impacto sobre la era de la identidad sintética, una propuesta de valor de los avatares para marcas (escalabilidad, control, consistencia 24/7), un llamado a la acción (CTA) ultra-persuasivo (ej: 'Comenta AVATAR o envíanos un DM para diseñar el próximo modelo digital de tu marca'), optimización SEO con palabras clave integradas y de 5 a 8 hashtags estratégicos (ej: #virtualavatar #digitalhuman #iasintetica #virtualsoulagency)."
