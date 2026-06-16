@@ -369,6 +369,17 @@ export function usePostIdeas({ currentAvatar, apiKey, showSuccess, showError }: 
     showSuccess(`Estilo del prompt de imagen configurado en: ${style === "ugc" ? "UGC (iPhone)" : "Editorial (Sony)"}`);
   }, [currentAvatar.id, showSuccess]);
 
+  // Limpiar todas las ideas planificadas de una sola vez
+  const handleClearAllIdeas = useCallback(() => {
+    setPostIdeas([]);
+    setSelectedIdea(null);
+    setPostPromptInput("");
+    setPromptOutput("");
+    setCaptionOutput("");
+    localStorage.removeItem(`ugc_post_ideas_${currentAvatar.id}`);
+    showSuccess("Todas las ideas planificadas han sido eliminadas.");
+  }, [currentAvatar.id, showSuccess]);
+
   // Seleccionar una idea de post para trabajar
   const handleSelectIdea = useCallback((idea: PostIdea) => {
     setSelectedIdea(idea);
@@ -399,6 +410,7 @@ export function usePostIdeas({ currentAvatar, apiKey, showSuccess, showError }: 
     handleGeneratePrompt,
     handleGenerateCaption,
     handleDeleteIdea,
+    handleClearAllIdeas,
     handleUpdateProductInfo,
     handleUpdateIdeaScenePrompt,
     handleUpdateIdeaStatus,

@@ -1,13 +1,13 @@
 import React from "react";
 import { 
-  Upload, Trash, ExternalLink, User, Award, Calendar, MessageCircle, DollarSign
+  Upload, Trash, ExternalLink, User, Award, Calendar, MessageCircle, DollarSign, Sparkles
 } from "lucide-react";
 import { AvatarIdentity } from "@/lib/db";
 
 interface AvatarSidebarProps {
   currentAvatar: AvatarIdentity;
-  activeTab: "identity" | "setup" | "planner" | "chat" | "metrics";
-  setActiveTab: (tab: "identity" | "setup" | "planner" | "chat" | "metrics") => void;
+  activeTab: "identity" | "setup" | "planner" | "chat" | "metrics" | "showcase";
+  setActiveTab: (tab: "identity" | "setup" | "planner" | "chat" | "metrics" | "showcase") => void;
   handlePhotoUpload: (file: File) => void;
   handleRemovePhoto: () => void;
   avatarsLength: number;
@@ -158,6 +158,13 @@ export function AvatarSidebar({
         >
           <DollarSign className="w-4 h-4 text-emerald-500" />
           Métricas de Crecimiento
+        </button>
+        <button
+          onClick={() => setActiveTab("showcase")}
+          className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${activeTab === "showcase" ? "bg-gradient-to-r from-rose-500/10 to-amber-500/10 border border-rose-100 text-rose-600 shadow-sm" : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"}`}
+        >
+          <Sparkles className="w-4 h-4 text-purple-500" />
+          Muestras de la Agencia
         </button>
       </div>
       

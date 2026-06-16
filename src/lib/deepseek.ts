@@ -555,3 +555,80 @@ ESTRUCTURA DEL JSON ESPERADO:
   }
 }
 
+// 7. Generar Showcase de Muestra de la Agencia (UGC Showcase v2.0)
+export async function generateAgencyShowcase(
+  apiKey: string | undefined
+): Promise<{
+  avatar_info: {
+    nombre: string;
+    detalles: string;
+    dna_fisico: string;
+  };
+  carrusel_prompts: {
+    dynamic_scene: string;
+    makeup_level: string;
+  };
+  instagram_caption: string;
+}> {
+  const systemPrompt = `Eres el Director Creativo de VirtualSoul Agency, la agencia líder en creación de avatares sintéticos y modelos de IA fotorrealistas.
+Tu tarea es inventar un avatar de marca completamente aleatorio (con su nombre, detalles generales y un DNA físico altamente descriptivo en inglés) y generar una publicación de carrusel de muestra para el feed de Instagram de la agencia.
+
+Esta publicación sirve de muestra para demostrarle a las marcas el increíble realismo y la consistencia visual que VirtualSoul Agency puede lograr.
+
+REGLAS DE RESPUESTA:
+1. Devuelve EXCLUSIVAMENTE un objeto JSON estructurado con las llaves que se detallan a continuación.
+2. No agregues texto introductorio, explicaciones, ni bloques de código de marcado markdown (como \`\`\`json).
+
+ESTRUCTURA DEL JSON ESPERADO:
+{
+  "avatar_info": {
+    "nombre": "Nombre y apellido ficticios",
+    "detalles": "Ej: 28 años, Origen Italiano, residencia en Barcelona, nicho Lifestyle",
+    "dna_fisico": "Highly detailed physical description in technical English. MUST include ethnicity, hair style/length/color, eye color, sharp facial bone structure, skin texture with visible pores and realistic details, and default expression."
+  },
+  "carrusel_prompts": {
+    "dynamic_scene": "Must contain PHOTO 1, PHOTO 2, PHOTO 3, PHOTO 4, and PHOTO 5 prompts in English. Follow the CRITICAL CONSISTENCY RULE: describe the exact outfit, clothing colors, fabrics, hairstyle, lighting, and environment in full detail in PHOTO 1. Repeat the exact same detailed description in PHOTO 2 to 5, changing ONLY the camera scale (close-up, medium shot, wide shot), camera angle, and physical pose of the avatar. Do not use abbreviations or refer back to PHOTO 1; every photo must be fully self-contained so that Flow has all context when processed separately. Set the location in a beautiful, high-end cosmopolitan environment. The background must be in sharp focus, no bokeh.",
+    "makeup_level": "LEVEL 2 / CASUAL & LIFESTYLE" or "LEVEL 3 / GOING OUT & SOCIAL"
+  },
+  "instagram_caption": "Copy de ventas persuasivo redactado en español para el Instagram de nuestra agencia (VirtualSoul Agency). Debe destacar la calidad fotorrealista y la consistencia del avatar de muestra generado. Incluye un gancho inicial de alto impacto sobre la era de la identidad sintética, una propuesta de valor de los avatares para marcas (escalabilidad, control, consistencia 24/7), un llamado a la acción (CTA) ultra-persuasivo (ej: 'Comenta AVATAR o envíanos un DM para diseñar el próximo modelo digital de tu marca'), optimización SEO con palabras clave integradas y de 5 a 8 hashtags estratégicos (ej: #virtualavatar #digitalhuman #iasintetica #virtualsoulagency)."
+}`;
+
+  try {
+    const rawText = await callDeepSeek(apiKey, systemPrompt, "Genera el showcase en formato JSON.", true);
+    if (!rawText) {
+      throw new Error("La API de DeepSeek devolvió una respuesta vacía.");
+    }
+
+    let cleanText = rawText.trim();
+    if (cleanText.startsWith("```")) {
+      cleanText = cleanText.replace(/^```json\s*/i, "").replace(/```$/, "").trim();
+    }
+
+    // Remover caracteres de control no válidos
+    cleanText = cleanText.replace(/[\u0000-\u001F\u007F-\u009F]/g, "");
+
+    const result = JSON.parse(cleanText);
+
+    // Validar llaves del JSON
+    if (!result.avatar_info || !result.carrusel_prompts || !result.instagram_caption) {
+      throw new Error("El JSON no tiene la estructura requerida.");
+    }
+
+    // QA Protocol: Aislamiento del DNA para el avatar ficticio
+    if (result.avatar_info.dna_fisico) {
+      let dna = String(result.avatar_info.dna_fisico).trim();
+      dna = dna.replace(/^HIGH-FIDELITY CHARACTER DNA:\s*/gi, "");
+      dna = dna.replace(/^\[/g, "").replace(/\]\s*Master\.?$/gi, "");
+      dna = dna.replace(/Master\.?$/gi, "");
+      dna = dna.trim();
+      result.avatar_info.dna_fisico = dna;
+    }
+
+    return result;
+  } catch (error: any) {
+    console.error("Error generating agency showcase in deepseek.ts:", error);
+    throw new Error(`Error al generar showcase: ${error.message}`);
+  }
+}
+
+

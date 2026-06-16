@@ -19,6 +19,7 @@ import { SetupTab } from "@/components/dashboard/SetupTab";
 import { PlannerTab } from "@/components/dashboard/PlannerTab";
 import { ChatTab } from "@/components/dashboard/ChatTab";
 import { MetricsTab } from "@/components/dashboard/MetricsTab";
+import { ShowcaseTab } from "@/components/dashboard/ShowcaseTab";
 
 // Modales
 import { CreateAvatarModal } from "@/components/modals/CreateAvatarModal";
@@ -29,7 +30,7 @@ import { isKeyValid } from "@/lib/utils";
 
 export default function Page() {
   // Pestaña Activa
-  const [activeTab, setActiveTab] = useState<"identity" | "setup" | "planner" | "chat" | "metrics">("identity");
+  const [activeTab, setActiveTab] = useState<"identity" | "setup" | "planner" | "chat" | "metrics" | "showcase">("identity");
 
   // Alertas / Mensajes de Feedback
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -101,6 +102,7 @@ export default function Page() {
     handleGeneratePrompt,
     handleGenerateCaption,
     handleDeleteIdea,
+    handleClearAllIdeas,
     handleUpdateProductInfo,
     handleSelectIdea,
     handleUpdateIdeaStatus,
@@ -375,6 +377,7 @@ export default function Page() {
                 handleGeneratePrompt={handleGeneratePrompt}
                 handleGenerateCaption={handleGenerateCaption}
                 handleDeleteIdea={handleDeleteIdea}
+                handleClearAllIdeas={handleClearAllIdeas}
                 handleUpdateProductInfo={handleUpdateProductInfo}
                 handleSelectIdea={handleSelectIdea}
                 handleUpdatePromptStyle={handleUpdatePromptStyle}
@@ -406,6 +409,16 @@ export default function Page() {
                 currentAvatar={currentAvatar}
                 showSuccess={showSuccess}
                 showError={showError}
+              />
+            )}
+
+            {activeTab === "showcase" && (
+              <ShowcaseTab
+                apiKey={apiKey}
+                copiedText={copiedText}
+                copyToClipboard={copyToClipboard}
+                showError={showError}
+                showSuccess={showSuccess}
               />
             )}
 

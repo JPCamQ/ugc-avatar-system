@@ -25,6 +25,7 @@ interface PlannerTabProps {
   handleGeneratePrompt: (idea: PostIdea) => void;
   handleGenerateCaption: (idea: PostIdea) => void;
   handleDeleteIdea: (id: string) => void;
+  handleClearAllIdeas: () => void;
   handleUpdateProductInfo: (name: string, image?: string | null) => void;
   handleSelectIdea: (idea: PostIdea) => void;
   handleUpdatePromptStyle: (ideaId: string, style: "ugc" | "editorial") => void;
@@ -52,6 +53,7 @@ export function PlannerTab({
   handleGeneratePrompt,
   handleGenerateCaption,
   handleDeleteIdea,
+  handleClearAllIdeas,
   handleUpdateProductInfo,
   handleSelectIdea,
   handleUpdatePromptStyle,
@@ -123,14 +125,25 @@ export function PlannerTab({
 
           <div className="flex justify-between items-center mb-3 flex-shrink-0">
             <span className="text-xs font-bold text-slate-800">Ideas Planificadas</span>
-            <button
-              onClick={handleGenerateIdeas}
-              disabled={generatingIdeas}
-              className="px-2.5 py-1.5 rounded-xl bg-rose-500 hover:bg-rose-600 disabled:opacity-50 text-white transition-all cursor-pointer flex items-center gap-1 text-[10px] font-bold shadow-md shadow-rose-500/10"
-            >
-              {generatingIdeas ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
-              Generar 5 Ideas
-            </button>
+            <div className="flex gap-2">
+              {postIdeas.length > 0 && (
+                <button
+                  onClick={handleClearAllIdeas}
+                  className="px-2.5 py-1.5 rounded-xl text-red-500 bg-red-50 hover:bg-red-100 border border-red-100 transition-all cursor-pointer flex items-center gap-1 text-[10px] font-bold"
+                >
+                  <Trash className="w-3.5 h-3.5" />
+                  Limpiar Todo
+                </button>
+              )}
+              <button
+                onClick={handleGenerateIdeas}
+                disabled={generatingIdeas}
+                className="px-2.5 py-1.5 rounded-xl bg-rose-500 hover:bg-rose-600 disabled:opacity-50 text-white transition-all cursor-pointer flex items-center gap-1 text-[10px] font-bold shadow-md shadow-rose-500/10"
+              >
+                {generatingIdeas ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+                Generar 5 Ideas
+              </button>
+            </div>
           </div>
 
           {/* Lista Scrolleable */}
