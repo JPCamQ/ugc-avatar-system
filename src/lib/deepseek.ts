@@ -17,7 +17,7 @@ export async function callDeepSeek(
   retries = 3,
   delayMs = 1000
 ): Promise<string> {
-  const finalApiKey = apiKey || process.env.DEEPSEEK_API_KEY;
+  const finalApiKey = (!apiKey || apiKey === "SERVER_DEFAULT_KEY") ? process.env.DEEPSEEK_API_KEY : apiKey;
 
   if (!finalApiKey) {
     throw new Error("API Key de DeepSeek no configurada. Por favor indíquela en los ajustes o contacte al administrador.");

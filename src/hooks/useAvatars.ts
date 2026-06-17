@@ -65,6 +65,18 @@ export function useAvatars({ showSuccess, showError }: UseAvatarsProps) {
         if (!res.ok) throw new Error("Error en respuesta de API");
         const data = await res.json();
         
+        // Si el servidor tiene la API Key de DeepSeek configurada globalmente y no hay clave local:
+        if (data.hasGlobalApiKey) {
+          const savedKeyEncoded = localStorage.getItem("deepseek_avatar_api_key_enc");
+          const savedKeyPlain = localStorage.getItem("deepseek_avatar_api_key");
+          const hasLocalKey = savedKeyEncoded || (savedKeyPlain && savedKeyPlain.trim() !== "" && savedKeyPlain !== "undefined");
+          
+          if (!hasLocalKey) {
+            setApiKey("SERVER_DEFAULT_KEY");
+            setShowApiKeyInput(false);
+          }
+        }
+        
         let loadedAvatars: AvatarIdentity[] = data.data || [];
         
         if (loadedAvatars.length === 0) {

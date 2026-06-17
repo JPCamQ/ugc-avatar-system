@@ -8,7 +8,10 @@ export async function GET() {
     const avatars = await prisma.avatar.findMany({
       orderBy: { createdAt: "asc" },
     });
-    return NextResponse.json({ data: avatars });
+    return NextResponse.json({ 
+      data: avatars,
+      hasGlobalApiKey: !!process.env.DEEPSEEK_API_KEY 
+    });
   } catch (error: any) {
     console.error("Error in GET /api/avatars:", error);
     return NextResponse.json(
