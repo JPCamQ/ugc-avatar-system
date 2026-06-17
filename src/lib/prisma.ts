@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from ".prisma/client";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: any;
@@ -29,4 +29,4 @@ export const prisma = new Proxy({} as any, {
 });
 
 export { PrismaClient };
-export type { Avatar, PostIdea, ChatSimulation, ChatMessage, AccountSetup } from "@prisma/client";
+export type { Avatar, PostIdea, ChatSimulation, ChatMessage, AccountSetup } from ".prisma/client";

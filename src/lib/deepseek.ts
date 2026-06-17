@@ -40,7 +40,8 @@ export async function callDeepSeek(
           model: "deepseek-chat",
           messages,
           response_format: jsonMode ? { type: "json_object" } : undefined,
-          temperature: 0.7
+          temperature: 0.7,
+          max_tokens: 2000
         }),
         signal: controller.signal
       });
