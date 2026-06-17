@@ -1,21 +1,24 @@
 import { NextResponse } from "next/server";
 import { generateInstagramCaption } from "@/lib/deepseek";
-import { AvatarIdentity, PostIdea } from "@/lib/db";
+import { AvatarIdentity, PostIdea } from "@/lib/types";
+import { captionRequestSchema } from "@/lib/validations/api";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { avatar, idea } = body;
-
-    const authHeader = request.headers.get("authorization");
-    const apiKey = authHeader ? authHeader.replace("Bearer ", "").trim() : body.apiKey;
-
-    if (!avatar || !idea) {
+    const validation = captionRequestSchema.safeParse(body);
+    if (!validation.success) {
+      const errorMsg = validation.error.issues.map((e) => `${e.path.join(".")}: ${e.message}`).join(", ");
       return NextResponse.json(
-        { error: "Faltan parámetros requeridos: avatar e idea." },
+        { error: `Datos de petición inválidos: ${errorMsg}` },
         { status: 400 }
       );
     }
+
+    const { avatar, idea } = validation.data;
+
+    const authHeader = request.headers.get("authorization");
+    const apiKey = authHeader ? authHeader.replace("Bearer ", "").trim() : (body.apiKey as string | undefined);
 
     const caption = await generateInstagramCaption(
       avatar as AvatarIdentity,

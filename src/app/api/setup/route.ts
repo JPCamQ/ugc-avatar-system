@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { generateAccountSetup } from "@/lib/deepseek";
-import { AvatarIdentity } from "@/lib/db";
+import { AvatarIdentity } from "@/lib/types";
 
 export async function POST(request: Request) {
   try {

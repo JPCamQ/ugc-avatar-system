@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { TrendingUp, Sparkles, RefreshCw, Key, ShieldAlert, Check, AlertCircle } from "lucide-react";
+import React, { useState, useEffect, useCallback } from "react";
+import { TrendingUp, Sparkles, RefreshCw, Key, Check, AlertCircle, ArrowUpRight, Users, Share2, MessageSquare } from "lucide-react";
 import { motion } from "framer-motion";
-import { AvatarIdentity } from "@/lib/db";
+import { AvatarIdentity } from "@/lib/types";
 
 interface MetricsTabProps {
   currentAvatar: AvatarIdentity;
@@ -18,6 +18,16 @@ interface RealMetrics {
   reachChange: number;
   engagement: number;
   platform: "instagram" | "tiktok" | null;
+  isConnected?: boolean;
+  isConnectedReal?: boolean;
+  connectedUsername?: string | null;
+}
+
+interface HistoricalMetric {
+  date: string;
+  followers: number;
+  reach: number;
+  engagement: number;
 }
 
 export function MetricsTab({
@@ -25,13 +35,10 @@ export function MetricsTab({
   showSuccess,
   showError
 }: MetricsTabProps) {
-  const [isConnected, setIsConnected] = useState(false);
-  const [platform, setPlatform] = useState<"instagram" | "tiktok" | null>(null);
-  const [accessToken, setAccessToken] = useState("");
-  const [showConnectForm, setShowConnectForm] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  // Métricas
+  const [selectedTab, setSelectedTab] = useState<"followers" | "reach" | "engagement">("followers");
+  
+  // Estado para la información sobre métricas
   const [metrics, setMetrics] = useState<RealMetrics>({
     followers: 42300,
     followersChange: 12.0,
@@ -40,113 +47,182 @@ export function MetricsTab({
     reach: 245000,
     reachChange: 18.4,
     engagement: 5.8,
-    platform: null
+    platform: "instagram",
+    isConnected: false,
+    isConnectedReal: false,
+    connectedUsername: null
   });
 
-  // Cargar estado de conexión de localStorage por avatar
-  useEffect(() => {
-    if (!currentAvatar?.id) return;
-    const savedConnection = localStorage.getItem(`ugc_metrics_conn_${currentAvatar.id}`);
-    if (savedConnection) {
-      try {
-        const connData = JSON.parse(savedConnection);
-        setIsConnected(true);
-        setPlatform(connData.platform);
-        setAccessToken(connData.token);
-        
-        // Simular llamada a la API con el token guardado
-        fetchRealMetrics(connData.platform, connData.token);
-      } catch (e) {
-        console.error(e);
-      }
-    } else {
-      setIsConnected(false);
-      setPlatform(null);
-      setAccessToken("");
-      // Reset a demo metrics
-      setMetrics({
-        followers: 42300,
-        followersChange: 12.0,
-        dmsReceived: 3124,
-        dmsChange: 8.4,
-        reach: 245000,
-        reachChange: 18.4,
-        engagement: 5.8,
-        platform: null
-      });
-    }
-  }, [currentAvatar?.id]);
+  // Estado para el histórico de 7 días
+  const [historicalData, setHistoricalData] = useState<HistoricalMetric[]>([]);
 
-  const fetchRealMetrics = async (selectedPlatform: "instagram" | "tiktok", token: string) => {
-    setLoading(true);
+  // Estado para el punto hovered en el SVG
+  const [hoveredPoint, setHoveredPoint] = useState<{
+    index: number;
+    x: number;
+    y: number;
+    val: number;
+    date: string;
+  } | null>(null);
+
+  const avatarId = currentAvatar?.id;
+
+  // Función para obtener las métricas reales
+  const fetchMetrics = useCallback(async () => {
+    if (!avatarId) return;
+    Promise.resolve().then(() => setLoading(true));
     try {
-      // Llamar al endpoint local del servidor (crearemos /api/metrics en breve)
       const response = await fetch("/api/metrics", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ platform: selectedPlatform, token, avatarId: currentAvatar.id })
+        body: JSON.stringify({ avatarId, platform: "instagram" })
       });
       const data = await response.json();
       
       if (!response.ok || data.error) {
-        throw new Error(data.error || "Error al obtener métricas reales");
+        throw new Error(data.error || "Error al obtener métricas");
       }
       
-      setMetrics(data.metrics);
-      showSuccess(`Métricas reales de ${selectedPlatform === "instagram" ? "Instagram" : "TikTok"} actualizadas.`);
-    } catch (err: any) {
+      if (data.metrics) {
+        setMetrics(data.metrics);
+      }
+      if (data.historicalData) {
+        setHistoricalData(data.historicalData);
+      }
+    } catch (err: unknown) {
       console.error(err);
-      // Fallback a demo con aviso
-      showError("No se pudieron verificar las credenciales reales de la API. Mostrando datos optimizados de caché.");
+      const msg = err instanceof Error ? err.message : "Error desconocido";
+      showError(`No se pudieron cargar las métricas en tiempo real: ${msg}. Mostrando datos de simulación.`);
     } finally {
       setLoading(false);
     }
-  };
+  }, [avatarId, showError]);
 
-  const handleConnect = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!platform) {
-      showError("Por favor, selecciona una plataforma.");
-      return;
-    }
-    if (!accessToken.trim()) {
-      showError("Por favor, introduce el token de acceso.");
-      return;
-    }
-
-    setLoading(true);
-    // Guardar conexión en localStorage
-    const connData = { platform, token: accessToken };
-    localStorage.setItem(`ugc_metrics_conn_${currentAvatar.id}`, JSON.stringify(connData));
-    setIsConnected(true);
-    setShowConnectForm(false);
-    
-    await fetchRealMetrics(platform, accessToken);
-    setLoading(false);
-  };
-
-  const handleDisconnect = () => {
-    localStorage.removeItem(`ugc_metrics_conn_${currentAvatar.id}`);
-    setIsConnected(false);
-    setPlatform(null);
-    setAccessToken("");
-    setMetrics({
-      followers: 42300,
-      followersChange: 12.0,
-      dmsReceived: 3124,
-      dmsChange: 8.4,
-      reach: 245000,
-      reachChange: 18.4,
-      engagement: 5.8,
-      platform: null
+  // Cargar métricas al cambiar de avatar o al montar
+  useEffect(() => {
+    Promise.resolve().then(() => {
+      fetchMetrics();
     });
-    showSuccess("Cuenta desconectada. Regresando a datos de demostración.");
+  }, [fetchMetrics]);
+
+  // Desconectar cuenta limpiando los tokens en la DB
+  const handleDisconnect = async () => {
+    if (!avatarId) return;
+    Promise.resolve().then(() => setLoading(true));
+    try {
+      const response = await fetch(`/api/avatars/${avatarId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          instagramAccessToken: null,
+          instagramUserId: null,
+          instagramUserName: null
+        })
+      });
+      const data = await response.json();
+      
+      if (!response.ok || data.error) {
+        throw new Error(data.error || "Error al desconectar la cuenta");
+      }
+      
+      showSuccess("Cuenta de Instagram desconectada con éxito.");
+      await fetchMetrics();
+    } catch (err: unknown) {
+      console.error(err);
+      const msg = err instanceof Error ? err.message : "Error desconocido";
+      showError(`No se pudo desconectar la cuenta de Instagram: ${msg}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const formatNumber = (num: number) => {
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
     if (num >= 1000) return `${(num / 1000).toFixed(1)}k`;
     return num.toString();
+  };
+
+  // --- LÓGICA DE DIBUJADO DE GRÁFICO SVG ---
+  const width = 600;
+  const height = 240;
+  const margin = { top: 20, right: 30, bottom: 40, left: 55 };
+  const chartWidth = width - margin.left - margin.right;
+  const chartHeight = height - margin.top - margin.bottom;
+
+  // Obtener valores según la pestaña activa
+  const getValuesArray = () => {
+    if (!historicalData.length) return [];
+    return historicalData.map(d => {
+      if (selectedTab === "followers") return d.followers;
+      if (selectedTab === "reach") return d.reach;
+      return d.engagement;
+    });
+  };
+
+  const values = getValuesArray();
+  const maxVal = values.length ? Math.max(...values) : 1;
+  const minVal = values.length ? Math.min(...values) : 0;
+  const valRange = maxVal - minVal;
+  
+  // Agregar padding al eje Y para que no toque los bordes superior e inferior
+  const yMax = maxVal + (valRange * 0.15 || 1);
+  const yMin = Math.max(0, minVal - (valRange * 0.15 || 0.1));
+
+  // Generar coordenadas X, Y para cada punto
+  const points = historicalData.map((item, i) => {
+    const val = selectedTab === "followers" ? item.followers : selectedTab === "reach" ? item.reach : item.engagement;
+    const x = margin.left + (i * chartWidth) / (historicalData.length - 1 || 1);
+    const y = margin.top + chartHeight - ((val - yMin) / (yMax - yMin || 1)) * chartHeight;
+    return { x, y, val, date: item.date, index: i };
+  });
+
+  // Crear strings de dibujo para el SVG
+  const pathD = points.length 
+    ? points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ")
+    : "";
+
+  const areaD = points.length
+    ? `${pathD} L ${points[points.length - 1].x} ${margin.top + chartHeight} L ${points[0].x} ${margin.top + chartHeight} Z`
+    : "";
+
+  // Calcular las líneas horizontales de cuadrícula (grid lines)
+  const gridLinesCount = 4;
+  const gridLines = Array.from({ length: gridLinesCount }).map((_, idx) => {
+    const ratio = idx / (gridLinesCount - 1);
+    const y = margin.top + ratio * chartHeight;
+    const val = yMax - ratio * (yMax - yMin);
+    return { y, val };
+  });
+
+  // Formatear etiquetas Y
+  const formatMetricValue = (val: number) => {
+    if (selectedTab === "engagement") return `${val.toFixed(1)}%`;
+    return formatNumber(Math.round(val));
+  };
+
+  // Manejar el movimiento del mouse sobre el gráfico
+  const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
+    if (!points.length) return;
+    const svgRect = e.currentTarget.getBoundingClientRect();
+    const mouseX = ((e.clientX - svgRect.left) / svgRect.width) * width;
+    
+    // Encontrar el punto X más cercano
+    let closest = points[0];
+    let minDiff = Math.abs(points[0].x - mouseX);
+    
+    for (let i = 1; i < points.length; i++) {
+      const diff = Math.abs(points[i].x - mouseX);
+      if (diff < minDiff) {
+        minDiff = diff;
+        closest = points[i];
+      }
+    }
+    
+    setHoveredPoint(closest);
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredPoint(null);
   };
 
   return (
@@ -159,6 +235,7 @@ export function MetricsTab({
     >
       <div className="bg-white/70 backdrop-blur-md border border-white/60 rounded-3xl p-6 sm:p-8 flex-1 flex flex-col justify-between shadow-lg shadow-slate-100/50">
         <div>
+          {/* Cabecera */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div>
               <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
@@ -169,144 +246,295 @@ export function MetricsTab({
             </div>
             
             <div className="flex gap-2 w-full sm:w-auto justify-end">
-              {isConnected ? (
+              {metrics.isConnected ? (
                 <button
                   onClick={handleDisconnect}
-                  className="px-4 py-1.5 rounded-xl text-xs font-bold text-red-500 bg-red-50 border border-red-150 hover:bg-red-100 transition-all cursor-pointer"
+                  disabled={loading}
+                  className="px-4 py-1.5 rounded-xl text-xs font-bold text-red-500 bg-red-50 border border-red-150 hover:bg-red-100 transition-all cursor-pointer disabled:opacity-50"
                 >
-                  Desconectar API
+                  {loading ? "Procesando..." : "Desconectar API"}
                 </button>
               ) : (
-                <button
-                  onClick={() => setShowConnectForm(!showConnectForm)}
+                <a
+                  href={`/api/auth/instagram?avatarId=${currentAvatar.id}`}
                   className="px-4 py-1.5 rounded-xl text-xs font-bold bg-rose-500 hover:bg-rose-600 text-white border border-rose-600/20 transition-all cursor-pointer flex items-center gap-1.5 shadow-md shadow-rose-500/10"
                 >
                   <Key className="w-3.5 h-3.5" />
                   Conectar API Real
-                </button>
+                </a>
               )}
             </div>
           </div>
 
-          {/* Formulario de Conexión API */}
-          {showConnectForm && (
-            <motion.form 
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              onSubmit={handleConnect}
-              className="mb-6 p-5 rounded-2xl border border-rose-100 bg-rose-50/20 space-y-4"
-            >
-              <h3 className="text-xs font-bold text-slate-900 flex items-center gap-1">
-                <Sparkles className="w-4 h-4 text-amber-500" />
-                Configurar Integración API de Redes Sociales (Meta Graph API / TikTok Developer)
-              </h3>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
-                <div>
-                  <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-wide mb-1.5 font-semibold">Plataforma</label>
-                  <select
-                    value={platform || ""}
-                    onChange={(e) => setPlatform(e.target.value as "instagram" | "tiktok")}
-                    className="w-full bg-white border border-slate-200/50 rounded-xl px-3 py-2 text-xs text-slate-700 focus:outline-none"
-                  >
-                    <option value="">Seleccionar plataforma</option>
-                    <option value="instagram">Instagram Graph API</option>
-                    <option value="tiktok">TikTok Creator API</option>
-                  </select>
-                </div>
-                <div className="sm:col-span-2">
-                  <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-wide mb-1.5 font-semibold">User Access Token / API Key</label>
-                  <input
-                    type="password"
-                    value={accessToken}
-                    onChange={(e) => setAccessToken(e.target.value)}
-                    placeholder="Escribe tu Access Token (ej. EAACEdEoseba...)"
-                    className="w-full bg-white border border-slate-200/50 rounded-xl px-3 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none font-semibold"
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowConnectForm(false)}
-                  className="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-500 hover:bg-slate-100 cursor-pointer"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="px-4 py-1.5 rounded-lg bg-rose-500 text-white text-xs font-bold hover:bg-rose-600 disabled:opacity-50 cursor-pointer shadow flex items-center gap-1.5"
-                >
-                  {loading && <RefreshCw className="w-3 h-3 animate-spin" />}
-                  Conectar Cuenta
-                </button>
-              </div>
-            </motion.form>
-          )}
-
           {/* Banner de Estado de Conexión */}
-          <div className={`mb-6 p-3 rounded-2xl border text-xs flex items-center justify-between gap-4 font-semibold ${isConnected ? "bg-emerald-50 border-emerald-100 text-emerald-800" : "bg-amber-50 border-amber-100 text-amber-800"}`}>
+          <div className={`mb-6 p-3 rounded-2xl border text-xs flex items-center justify-between gap-4 font-semibold ${metrics.isConnected ? "bg-emerald-50 border-emerald-100 text-emerald-800" : "bg-amber-50 border-amber-100 text-amber-800"}`}>
             <div className="flex items-center gap-2">
-              {isConnected ? <Check className="w-4 h-4 text-emerald-600" /> : <AlertCircle className="w-4 h-4 text-amber-600" />}
+              {metrics.isConnected ? <Check className="w-4 h-4 text-emerald-600" /> : <AlertCircle className="w-4 h-4 text-amber-600" />}
               <span>
-                {isConnected 
-                  ? `Conectado exitosamente a la API de ${platform === "instagram" ? "Instagram" : "TikTok"}. Datos reales actualizados.`
-                  : "Modo Demostración activo. Las métricas que ves abajo son simulaciones realistas de engagement."
+                {metrics.isConnected 
+                  ? `Conectado exitosamente a la API de Instagram como @${metrics.connectedUsername || currentAvatar.name}. Datos reales sincronizados.`
+                  : "Modo Demostración activo. Las métricas que ves abajo son simulaciones estables de engagement."
                 }
               </span>
             </div>
-            {!isConnected && (
-              <button 
-                type="button"
-                onClick={() => setShowConnectForm(true)}
+            {!metrics.isConnected && (
+              <a 
+                href={`/api/auth/instagram?avatarId=${currentAvatar.id}`}
                 className="text-[10px] text-amber-700 underline font-black hover:text-amber-900 cursor-pointer"
               >
                 Conectar ahora
-              </button>
+              </a>
             )}
           </div>
 
           {/* Fila de Tarjetas de Métricas */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl text-left shadow-sm">
-              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block font-semibold">Seguidores {isConnected ? "Reales" : "Estimados"}</span>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl text-left shadow-sm relative overflow-hidden group">
+              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block font-semibold">Seguidores {metrics.isConnected ? "Reales" : "Estimados"}</span>
               <div className="flex items-baseline gap-1.5 mt-1">
                 <span className="text-2xl font-black text-slate-800">{formatNumber(metrics.followers)}</span>
-                <span className={`text-[10px] font-bold ${metrics.followersChange >= 0 ? "text-emerald-500" : "text-red-500"}`}>
-                  {metrics.followersChange >= 0 ? "+" : ""}{metrics.followersChange}%
+                <span className={`text-[10px] font-bold flex items-center ${metrics.followersChange >= 0 ? "text-emerald-500" : "text-red-500"}`}>
+                  <ArrowUpRight className="w-3 h-3 inline" /> {metrics.followersChange >= 0 ? "+" : ""}{metrics.followersChange}%
                 </span>
               </div>
+              <Users className="absolute right-3 bottom-3 w-8 h-8 text-slate-100 group-hover:text-sky-100 transition-colors pointer-events-none" />
             </div>
 
-            <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl text-left shadow-sm">
-              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block font-semibold">Mensajes DMs {isConnected ? "API" : "Recibidos"}</span>
+            <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl text-left shadow-sm relative overflow-hidden group">
+              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block font-semibold">Mensajes DMs {metrics.isConnected ? "API" : "Recibidos"}</span>
               <div className="flex items-baseline gap-1.5 mt-1">
                 <span className="text-2xl font-black text-slate-800">{metrics.dmsReceived.toLocaleString()}</span>
-                <span className={`text-[10px] font-bold ${metrics.dmsChange >= 0 ? "text-emerald-500" : "text-red-500"}`}>
-                  {metrics.dmsChange >= 0 ? "+" : ""}{metrics.dmsChange}%
+                <span className={`text-[10px] font-bold flex items-center ${metrics.dmsChange >= 0 ? "text-emerald-500" : "text-red-500"}`}>
+                  <ArrowUpRight className="w-3 h-3 inline" /> {metrics.dmsChange >= 0 ? "+" : ""}{metrics.dmsChange}%
                 </span>
               </div>
+              <MessageSquare className="absolute right-3 bottom-3 w-8 h-8 text-slate-100 group-hover:text-emerald-100 transition-colors pointer-events-none" />
             </div>
 
-            <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl text-left shadow-sm">
+            <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl text-left shadow-sm relative overflow-hidden group">
               <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block font-semibold">Alcance Semanal</span>
               <div className="flex items-baseline gap-1.5 mt-1">
                 <span className="text-2xl font-black text-slate-800">{formatNumber(metrics.reach)}</span>
-                <span className={`text-[10px] font-bold ${metrics.reachChange >= 0 ? "text-emerald-500" : "text-red-500"}`}>
-                  {metrics.reachChange >= 0 ? "+" : ""}{metrics.reachChange}%
+                <span className={`text-[10px] font-bold flex items-center ${metrics.reachChange >= 0 ? "text-emerald-500" : "text-red-500"}`}>
+                  <ArrowUpRight className="w-3 h-3 inline" /> {metrics.reachChange >= 0 ? "+" : ""}{metrics.reachChange}%
                 </span>
               </div>
+              <Share2 className="absolute right-3 bottom-3 w-8 h-8 text-slate-100 group-hover:text-rose-100 transition-colors pointer-events-none" />
             </div>
 
-            <div className="bg-rose-50/70 border border-rose-100 p-4 rounded-2xl text-left shadow-sm">
+            <div className="bg-rose-50/70 border border-rose-100 p-4 rounded-2xl text-left shadow-sm relative overflow-hidden group">
               <span className="text-[9px] font-bold text-rose-600 uppercase tracking-wider block font-semibold">Engagement Promedio</span>
               <div className="flex items-baseline gap-1.5 mt-1">
                 <span className="text-2xl font-black text-rose-600">{metrics.engagement}%</span>
-                <span className="text-[10px] text-rose-500 font-bold font-bold">Muy Alto</span>
+                <span className="text-[10px] text-rose-500 font-bold ml-1">Muy Alto</span>
+              </div>
+              <Sparkles className="absolute right-3 bottom-3 w-8 h-8 text-rose-100/30 group-hover:text-rose-200/50 transition-colors pointer-events-none" />
+            </div>
+          </div>
+
+          {/* Gráfico Histórico Interactivo SVG */}
+          <div className="bg-white border border-slate-100 rounded-3xl p-5 mb-6 shadow-sm">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-5">
+              <div>
+                <h3 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                  <TrendingUp className="w-4 h-4 text-rose-500" />
+                  Rendimiento Histórico (Últimos 7 días)
+                </h3>
+                <p className="text-[10px] text-slate-400">Interactúa con el gráfico pasando el cursor sobre los puntos.</p>
+              </div>
+
+              {/* Pestañas del Gráfico */}
+              <div className="flex bg-slate-100 p-0.5 rounded-xl border border-slate-200/40">
+                <button
+                  onClick={() => setSelectedTab("followers")}
+                  className={`px-3 py-1 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${selectedTab === "followers" ? "bg-white text-sky-600 shadow-sm" : "text-slate-500 hover:text-slate-800"}`}
+                >
+                  Seguidores
+                </button>
+                <button
+                  onClick={() => setSelectedTab("reach")}
+                  className={`px-3 py-1 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${selectedTab === "reach" ? "bg-white text-pink-600 shadow-sm" : "text-slate-500 hover:text-slate-800"}`}
+                >
+                  Alcance
+                </button>
+                <button
+                  onClick={() => setSelectedTab("engagement")}
+                  className={`px-3 py-1 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${selectedTab === "engagement" ? "bg-white text-violet-600 shadow-sm" : "text-slate-500 hover:text-slate-800"}`}
+                >
+                  Engagement
+                </button>
               </div>
             </div>
+
+            {loading ? (
+              <div className="h-[240px] flex items-center justify-center text-slate-400 text-xs">
+                <RefreshCw className="w-5 h-5 animate-spin mr-2 text-rose-500" />
+                Cargando historial de métricas...
+              </div>
+            ) : historicalData.length === 0 ? (
+              <div className="h-[240px] flex items-center justify-center text-slate-400 text-xs">
+                No hay datos históricos disponibles en este momento.
+              </div>
+            ) : (
+              <div className="relative w-full">
+                {/* SVG del Gráfico */}
+                <svg
+                  viewBox={`0 0 ${width} ${height}`}
+                  className="w-full h-auto overflow-visible select-none"
+                  onMouseMove={handleMouseMove}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  {/* Definición de degradados */}
+                  <defs>
+                    <linearGradient id="grad-followers" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#0ea5e9" stopOpacity="0.25" />
+                      <stop offset="100%" stopColor="#0ea5e9" stopOpacity="0.0" />
+                    </linearGradient>
+                    <linearGradient id="grad-reach" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#ec4899" stopOpacity="0.25" />
+                      <stop offset="100%" stopColor="#ec4899" stopOpacity="0.0" />
+                    </linearGradient>
+                    <linearGradient id="grad-engagement" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#8b5cf6" stopOpacity="0.25" />
+                      <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0.0" />
+                    </linearGradient>
+                  </defs>
+
+                  {/* Líneas horizontales de cuadrícula (Grid Lines) */}
+                  {gridLines.map((line, idx) => (
+                    <g key={idx}>
+                      <line
+                        x1={margin.left}
+                        y1={line.y}
+                        x2={width - margin.right}
+                        y2={line.y}
+                        stroke="#f1f5f9"
+                        strokeWidth={1}
+                      />
+                      <text
+                        x={margin.left - 10}
+                        y={line.y + 3}
+                        textAnchor="end"
+                        className="text-[9px] font-bold fill-slate-400 font-sans"
+                      >
+                        {formatMetricValue(line.val)}
+                      </text>
+                    </g>
+                  ))}
+
+                  {/* Líneas verticales tenues y etiquetas de fechas (Eje X) */}
+                  {points.map((p, idx) => (
+                    <g key={idx}>
+                      <line
+                        x1={p.x}
+                        y1={margin.top}
+                        x2={p.x}
+                        y2={margin.top + chartHeight}
+                        stroke="#f8fafc"
+                        strokeWidth={1}
+                      />
+                      <text
+                        x={p.x}
+                        y={height - margin.bottom + 18}
+                        textAnchor="middle"
+                        className="text-[9px] font-bold fill-slate-400 font-sans"
+                      >
+                        {p.date}
+                      </text>
+                    </g>
+                  ))}
+
+                  {/* Degradado bajo la curva */}
+                  <path
+                    d={areaD}
+                    fill={`url(#grad-${selectedTab})`}
+                  />
+
+                  {/* Línea de Curva Principal */}
+                  <path
+                    d={pathD}
+                    fill="none"
+                    stroke={
+                      selectedTab === "followers" 
+                        ? "#0ea5e9" 
+                        : selectedTab === "reach" 
+                        ? "#ec4899" 
+                        : "#8b5cf6"
+                    }
+                    strokeWidth={3}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+
+                  {/* Línea vertical de guía cuando hay Hover */}
+                  {hoveredPoint && (
+                    <line
+                      x1={hoveredPoint.x}
+                      y1={margin.top}
+                      x2={hoveredPoint.x}
+                      y2={margin.top + chartHeight}
+                      stroke={
+                        selectedTab === "followers" 
+                          ? "#0ea5e9" 
+                          : selectedTab === "reach" 
+                          ? "#ec4899" 
+                          : "#8b5cf6"
+                      }
+                      strokeWidth={1}
+                      strokeDasharray="4 4"
+                    />
+                  )}
+
+                  {/* Círculos en los nodos */}
+                  {points.map((p, idx) => (
+                    <circle
+                      key={idx}
+                      cx={p.x}
+                      cy={p.y}
+                      r={hoveredPoint?.index === idx ? 6 : 4}
+                      fill={
+                        selectedTab === "followers" 
+                          ? "#0ea5e9" 
+                          : selectedTab === "reach" 
+                          ? "#ec4899" 
+                          : "#8b5cf6"
+                      }
+                      stroke="#ffffff"
+                      strokeWidth={2}
+                      className="transition-all duration-75"
+                    />
+                  ))}
+                </svg>
+
+                {/* Tooltip flotante absoluto en HTML */}
+                {hoveredPoint && (
+                  <div
+                    className="absolute pointer-events-none bg-slate-900/90 text-white text-[10px] p-2.5 rounded-2xl border border-white/10 shadow-2xl backdrop-blur-md transition-all duration-75 font-sans"
+                    style={{
+                      left: `${(hoveredPoint.x / width) * 100}%`,
+                      top: `${(hoveredPoint.y / height) * 100 - 18}%`,
+                      transform: "translate(-50%, -100%)"
+                    }}
+                  >
+                    <div className="font-bold text-slate-300 mb-0.5">{hoveredPoint.date}</div>
+                    <div className="font-extrabold flex items-center gap-1">
+                      <span 
+                        className={`w-1.5 h-1.5 rounded-full ${
+                          selectedTab === "followers" 
+                            ? "bg-sky-400" 
+                            : selectedTab === "reach" 
+                            ? "bg-pink-400" 
+                            : "bg-violet-400"
+                        }`} 
+                      />
+                      {selectedTab === "followers" && `Seguidores: ${hoveredPoint.val.toLocaleString()}`}
+                      {selectedTab === "reach" && `Alcance: ${hoveredPoint.val.toLocaleString()}`}
+                      {selectedTab === "engagement" && `Engagement: ${hoveredPoint.val.toFixed(1)}%`}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Tabla de Conversiones */}
@@ -318,7 +546,7 @@ export function MetricsTab({
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="border-b border-slate-100 bg-slate-50/50 text-slate-400 font-bold text-[9px] uppercase font-bold">
+                  <tr className="border-b border-slate-100 bg-slate-50/50 text-slate-400 font-bold text-[9px] uppercase">
                     <th className="p-3">Seguidor</th>
                     <th className="p-3">Nacionalidad</th>
                     <th className="p-3">Interacción</th>

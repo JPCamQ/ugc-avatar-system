@@ -1,5 +1,3 @@
-// Módulo de base de datos en localStorage para el Ecosistema Multi-Avatar UGC
-
 export interface AvatarIdentity {
   id: string; // ID único (ej. milena_reyes)
   name: string;

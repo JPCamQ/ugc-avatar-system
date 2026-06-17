@@ -1,7 +1,7 @@
 /**
  * Utilidades compartidas del sistema de avatares UGC
  */
-import { AvatarIdentity } from "./db";
+import { AvatarIdentity } from "./types";
 
 // Validador simple de API Key
 export const isKeyValid = (key: string): boolean => {
@@ -13,7 +13,7 @@ export const encodeApiKey = (key: string): string => {
   if (!key) return "";
   try {
     return btoa(key);
-  } catch (e) {
+  } catch {
     return key;
   }
 };
@@ -22,7 +22,7 @@ export const decodeApiKey = (encodedKey: string): string => {
   if (!encodedKey) return "";
   try {
     return atob(encodedKey);
-  } catch (e) {
+  } catch {
     return encodedKey;
   }
 };
@@ -109,15 +109,17 @@ export const parseRepeatingIngredients = (fullPrompt: string): string => {
 export function getBasePortraitPrompt(avatar: AvatarIdentity): string {
   const genderLower = (avatar.gender || "").toLowerCase();
   const isMale = genderLower.includes("masc") || genderLower.includes("hombre") || genderLower.includes("male") || genderLower.includes("man") || avatar.id === "mateo_novak";
+  const isMilena = avatar.id === "milena_reyes" || avatar.name.toLowerCase().includes("milena");
+  const extraNegative = isMilena ? "freckles, moles, skin spots, facial blemishes, " : "";
   
   const possessive = isMale ? "his" : "her";
   const pronoun = isMale ? "he" : "she";
 
-  return `HIGH-FIDELITY CHARACTER DNA: [${avatar.characterDna}] Master.
+  return `HIGH-FIDELITY CHARACTER DNA: Master. [${avatar.characterDna}]
 
 DYNAMIC SCENE: [Standing indoors against a completely plain, flat, neutral light grey studio background. Even, soft natural light coming from a side window, casting subtle realistic shadows that define ${possessive} facial structure and jawline.]
 
 AUTHENTIC CREATOR: Shot on iPhone 17 Pro Max, wide angle lens, natural light only, no flash. Slightly overexposed. Real skin texture with natural inconsistencies — uneven tone, real pores, slight shine from heat. Hair not perfectly styled – a few strands out of place. Framing slightly imperfect, subject not perfectly centered. The image looks like a raw, unedited front-facing camera snapshot ${pronoun} posted to ${possessive} Instagram stories. No studio lighting. No cinematic look. No color science adjustments.
 
-Negative prompt constraints: bokeh, blurred background, golden hour, cinematic lighting, soft diffusion, studio lighting, color grading, beauty filter, perfect symmetry, airbrushed skin, plastic skin, 8K, hyper-detailed, Sony camera aesthetic, magazine quality, luxury campaign feel, soft studio light, gradient background, professional portrait photography setup.`;
+Negative prompt constraints: ${extraNegative}bokeh, blurred background, golden hour, cinematic lighting, soft diffusion, studio lighting, color grading, beauty filter, perfect symmetry, airbrushed skin, plastic skin, 8K, hyper-detailed, Sony camera aesthetic, magazine quality, luxury campaign feel, soft studio light, gradient background, professional portrait photography setup.`;
 }

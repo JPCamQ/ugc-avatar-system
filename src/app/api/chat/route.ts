@@ -1,21 +1,24 @@
 import { NextResponse } from "next/server";
 import { generateChatResponse } from "@/lib/deepseek";
-import { AvatarIdentity, ChatMessage } from "@/lib/db";
+import { AvatarIdentity, ChatMessage } from "@/lib/types";
+import { chatRequestSchema } from "@/lib/validations/api";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { avatar, messages } = body;
-
-    const authHeader = request.headers.get("authorization");
-    const apiKey = authHeader ? authHeader.replace("Bearer ", "").trim() : body.apiKey;
-
-    if (!avatar || !messages) {
+    const validation = chatRequestSchema.safeParse(body);
+    if (!validation.success) {
+      const errorMsg = validation.error.issues.map((e) => `${e.path.join(".")}: ${e.message}`).join(", ");
       return NextResponse.json(
-        { error: "Faltan parámetros requeridos: avatar y messages." },
+        { error: `Datos de chat inválidos: ${errorMsg}` },
         { status: 400 }
       );
     }
+
+    const { avatar, messages } = validation.data;
+
+    const authHeader = request.headers.get("authorization");
+    const apiKey = authHeader ? authHeader.replace("Bearer ", "").trim() : (body.apiKey as string | undefined);
 
     const reply = await generateChatResponse(
       avatar as AvatarIdentity,

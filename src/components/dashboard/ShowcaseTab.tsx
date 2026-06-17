@@ -79,10 +79,30 @@ export function ShowcaseTab({
     }
   };
 
+  // Ensamblar el prompt maestro de retrato de ADN para el avatar de muestra
+  const getShowcaseBasePortraitPrompt = (): string => {
+    if (!showcaseData) return "";
+    const isMale = selectedGender === "Masculino";
+    const possessive = isMale ? "his" : "her";
+    const pronoun = isMale ? "he" : "she";
+    
+    const nameLower = showcaseData.avatar_info.nombre.toLowerCase();
+    const isMilena = nameLower.includes("milena");
+    const extraNegative = isMilena ? "freckles, moles, skin spots, facial blemishes, " : "";
+
+    return `HIGH-FIDELITY CHARACTER DNA: Master. [${showcaseData.avatar_info.dna_fisico}]
+
+DYNAMIC SCENE: [Standing indoors against a completely plain, flat, neutral light grey studio background. Even, soft natural light coming from a side window, casting subtle realistic shadows that define ${possessive} facial structure and jawline.]
+
+AUTHENTIC CREATOR: Shot on iPhone 17 Pro Max, wide angle lens, natural light only, no flash. Slightly overexposed. Real skin texture with natural inconsistencies — uneven tone, real pores, slight shine from heat. Hair not perfectly styled – a few strands out of place. Framing slightly imperfect, subject not perfectly centered. The image looks like a raw, unedited front-facing camera snapshot ${pronoun} posted to ${possessive} Instagram stories. No studio lighting. No cinematic look. No color science adjustments.
+
+Negative prompt constraints: ${extraNegative}bokeh, blurred background, golden hour, cinematic lighting, soft diffusion, studio lighting, color grading, beauty filter, perfect symmetry, airbrushed skin, plastic skin, 8K, hyper-detailed, Sony camera aesthetic, magazine quality, luxury campaign feel, soft studio light, gradient background, professional portrait photography setup.`;
+  };
+
   // Ensamblar el prompt completo de carrusel de producción v2.0
   const getFullPrompt = (): string => {
     if (!showcaseData) return "";
-    return `HIGH-FIDELITY CHARACTER DNA: [${showcaseData.avatar_info.dna_fisico}] Master.
+    return `HIGH-FIDELITY CHARACTER DNA: Master. [${showcaseData.avatar_info.dna_fisico}]
 
 MAKEUP PROTOCOL — Context-adaptive:
 LEVEL 1 / GYM & SPORT: No makeup. Natural face, slight sweat shine, real skin only.
@@ -221,9 +241,28 @@ Negative prompt constraints: bokeh, blurred background, golden hour, cinematic l
                     <label className="block text-[9px] font-bold text-slate-450 uppercase mb-1 font-semibold">
                       DNA Físico (Consistencia Visual)
                     </label>
-                    <div className="bg-slate-900 text-slate-200 font-mono text-[9px] rounded-xl p-3 leading-relaxed border border-slate-850 max-h-36 overflow-y-auto no-scrollbar whitespace-pre-wrap select-all">
+                    <div className="bg-slate-900 text-slate-200 font-mono text-[9px] rounded-xl p-3 leading-relaxed border border-slate-850 max-h-24 overflow-y-auto no-scrollbar whitespace-pre-wrap select-all">
                       {showcaseData.avatar_info.dna_fisico}
                     </div>
+                  </div>
+
+                  {/* Prompt Maestro de Retrato para el Avatar Ficticio */}
+                  <div className="mt-4 pt-4 border-t border-slate-200/60">
+                    <div className="flex justify-between items-center mb-1.5">
+                      <label className="block text-[9px] font-bold text-rose-500 uppercase font-semibold flex items-center gap-1">
+                        <Sparkles className="w-3 h-3 text-amber-500 animate-pulse" />
+                        Retrato Base de Referencia
+                      </label>
+                      <button
+                        onClick={() => copyToClipboard(getShowcaseBasePortraitPrompt(), "showcase_portrait")}
+                        className="text-[8px] text-rose-500 hover:text-rose-600 flex items-center gap-0.5 cursor-pointer font-bold bg-white border border-slate-200 px-2 py-0.5 rounded-md shadow-sm hover:shadow transition-all"
+                      >
+                        {copiedText === "showcase_portrait" ? "¡Copiado!" : "Copiar Retrato"}
+                      </button>
+                    </div>
+                    <pre className="bg-slate-100 text-slate-650 font-mono text-[9px] rounded-xl p-3 leading-relaxed border border-slate-200 max-h-24 overflow-y-auto no-scrollbar whitespace-pre-wrap">
+                      {getShowcaseBasePortraitPrompt()}
+                    </pre>
                   </div>
                 </div>
 
@@ -312,8 +351,8 @@ Negative prompt constraints: bokeh, blurred background, golden hour, cinematic l
                   <div>
                     <h4 className="text-[11px] font-bold text-slate-800">¿Cómo usar estas muestras?</h4>
                     <p className="text-[9px] text-slate-500 mt-0.5 leading-relaxed">
-                      1. Copia el <strong>Prompt de la Toma 1</strong> y ejecútalo en Flow de Gemini. Almacena ese primer retrato como tu imagen base.<br />
-                      2. Copia los prompts de las Tomas 2 a 5 para renderizar el resto del carrusel con perfecta consistencia física.<br />
+                      1. Copia el prompt del <strong>Retrato Base de Referencia</strong> (columna izquierda) y ejecútalo en Flow de Gemini. Almacena esa imagen de retrato como tu molde base del personaje.<br />
+                      2. Copia los prompts de las Tomas 1 a 5 para renderizar el resto del carrusel con perfecta consistencia física (usando el personaje que creaste en el paso 1).<br />
                       3. Publica las imágenes resultantes en el Instagram de tu agencia y acompáñalas del <strong>Copy Corporativo</strong> para captar nuevos clientes interesados.
                     </p>
                   </div>

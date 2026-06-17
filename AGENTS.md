@@ -20,7 +20,7 @@ Este documento actúa como la especificación maestra e identidad del avatar de 
 - **Nicho:** Fitness & Lifestyle
 - **Tipo de cuenta:** AI Influencer (100% virtual)
 
-### Bio Instagram
+### Bio InstagramF
 ```
 Milena Reyes ✦ Virtual Soul
 💪 Fitness & Lifestyle | Miami
@@ -52,7 +52,7 @@ Nació en Caracas, Venezuela, en una familia de clase media con hambre de más. 
 Este bloque va **siempre al inicio** de cualquier prompt. No se modifica:
 
 ```text
-HIGH-FIDELITY CHARACTER DNA: Master. Photorealistic 
+HIGH-FIDELITY CHARACTER DNA: [ ] Master. Photorealistic 
 photograph of a 26-year-old Latina woman named Milena 
 Reyes. Venezuelan origin, Miami lifestyle. Natural dark 
 auburn/red wavy hair, medium length. Strong defined 

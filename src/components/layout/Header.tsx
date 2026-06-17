@@ -1,27 +1,21 @@
+"use client";
+
 import React from "react";
 import { Sparkles, UserPlus, Key } from "lucide-react";
-import { AvatarIdentity } from "@/lib/db";
 import { isKeyValid } from "@/lib/utils";
+import { useDashboard } from "@/context/DashboardContext";
 
-interface HeaderProps {
-  selectedAvatarId: string;
-  avatars: AvatarIdentity[];
-  handleSelectAvatarChange: (id: string) => void;
-  setShowCreateAvatarModal: (val: boolean) => void;
-  apiKey: string;
-  showApiKeyInput: boolean;
-  setShowApiKeyInput: (val: boolean) => void;
-}
+export function Header() {
+  const {
+    selectedAvatarId,
+    avatars,
+    handleSelectAvatarChange,
+    setShowCreateAvatarModal,
+    apiKey,
+    showApiKeyInput,
+    setShowApiKeyInput
+  } = useDashboard();
 
-export function Header({
-  selectedAvatarId,
-  avatars,
-  handleSelectAvatarChange,
-  setShowCreateAvatarModal,
-  apiKey,
-  showApiKeyInput,
-  setShowApiKeyInput
-}: HeaderProps) {
   return (
     <header className="relative z-10 border-b border-slate-100 bg-white/70 backdrop-blur-md px-6 py-4 font-sans">
       <div className="max-w-[1600px] mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">

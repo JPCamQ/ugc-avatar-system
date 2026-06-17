@@ -1,0 +1,127 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+  engineType = "library"
+}
+
+model Avatar {
+  id                  String   @id
+  name                String
+  age                 Int
+  niche               String
+  location            String
+  backstory           String
+  monetizationLink    String
+  monetizationProduct String
+  toneOfVoice         String
+  language            String
+  characterDna        String
+  audioSettings       String
+  videoSettings       String
+  avatarImage         String?  // Guarda base64 o URL
+  gender              String?  // Género
+  bodyType            String?  // Silueta / Tipo de cuerpo
+  instagramAccessToken String?
+  instagramUserId      String?
+  instagramUserName    String?
+
+
+  // Relaciones
+  postIdeas           PostIdea[]
+  chatSimulations     ChatSimulation[]
+  accountSetup        AccountSetup?
+
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model PostIdea {
+  id                  String   @id
+  avatarId            String
+  title               String
+  type                String   // "image" | "carousel" | "video" | "flyer"
+  location            String
+  phase               String   // "storytelling" | "value" | "conversion"
+  scenePrompt         String
+  formattedFlowPrompt String
+  instagramCaption    String
+  status              String   // "draft" | "generated" | "published"
+  createdAt           DateTime @default(now())
+  productImage        String?  // base64 o URL
+  productName         String?
+  promptStyle         String?  // "ugc" | "editorial"
+
+  // Relaciones
+  avatar              Avatar   @relation(fields: [avatarId], references: [id], onDelete: Cascade)
+}
+
+model ChatSimulation {
+  id                  String   @id
+  avatarId            String
+  userName            String
+  userBio             String
+  status              String   // "active" | "converted" | "lost"
+  notes               String?
+
+  // Relaciones
+  avatar              Avatar   @relation(fields: [avatarId], references: [id], onDelete: Cascade)
+  messages            ChatMessage[]
+
+  createdAt           DateTime @default(now())
+}
+
+model ChatMessage {
+  id                  String   @id
+  simulationId        String
+  sender              String   // "user" | "avatar"
+  text                String
+  timestamp           DateTime @default(now())
+
+  // Relaciones
+  simulation          ChatSimulation @relation(fields: [simulationId], references: [id], onDelete: Cascade)
+}
+
+model AccountSetup {
+  avatarId            String   @id
+  usernames           String   // JSON string
+  bios                String   // JSON string
+  gridPlan            String   // JSON string
+  seoTips             String   // JSON string
+
+  // Relaciones
+  avatar              Avatar   @relation(fields: [avatarId], references: [id], onDelete: Cascade)
+
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model Client {
+  id                  String   @id
+  name                String
+  email               String
+  whatsapp            String
+  country             String
+  plan                String
+  startDate           String
+  billingDay          Int
+  setupPaid           Boolean
+  avatarName          String
+  niche               String
+  notes               String?
+  status              String   // "active" | "inactive"
+  createdAt           DateTime @default(now())
+}
+
+model ContentBankItem {
+  id                  String   @id
+  clientId            String
+  type                String   // "post" | "story" | "reel" | "product"
+  desc                String
+  date                String
+  status              String   // "pending" | "generated" | "approved" | "published"
+  createdAt           DateTime @default(now())
+}
+

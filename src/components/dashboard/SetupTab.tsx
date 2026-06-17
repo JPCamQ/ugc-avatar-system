@@ -1,7 +1,7 @@
 import React from "react";
 import { Award, RefreshCw, Sparkles, Smartphone, Check, Copy, ShieldAlert } from "lucide-react";
 import { motion } from "framer-motion";
-import { AvatarIdentity } from "@/lib/db";
+import { AvatarIdentity } from "@/lib/types";
 
 interface SetupTabProps {
   currentAvatar: AvatarIdentity;

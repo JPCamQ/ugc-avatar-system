@@ -1,28 +1,25 @@
+"use client";
+
 import React from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { 
-  Upload, Trash, ExternalLink, User, Award, Calendar, MessageCircle, DollarSign, Sparkles
+  Upload, Trash, ExternalLink, User, Award, Calendar, MessageCircle, DollarSign, Sparkles, Shield
 } from "lucide-react";
-import { AvatarIdentity } from "@/lib/db";
+import { useDashboard } from "@/context/DashboardContext";
 
-interface AvatarSidebarProps {
-  currentAvatar: AvatarIdentity;
-  activeTab: "identity" | "setup" | "planner" | "chat" | "metrics" | "showcase";
-  setActiveTab: (tab: "identity" | "setup" | "planner" | "chat" | "metrics" | "showcase") => void;
-  handlePhotoUpload: (file: File) => void;
-  handleRemovePhoto: () => void;
-  avatarsLength: number;
-  showError: (msg: string) => void;
-}
+export function AvatarSidebar() {
+  const {
+    currentAvatar,
+    handlePhotoUpload,
+    handleRemovePhoto,
+    avatars,
+    showError
+  } = useDashboard();
 
-export function AvatarSidebar({
-  currentAvatar,
-  activeTab,
-  setActiveTab,
-  handlePhotoUpload,
-  handleRemovePhoto,
-  avatarsLength,
-  showError
-}: AvatarSidebarProps) {
+  const pathname = usePathname();
+  const isActive = (path: string) => pathname === path;
+  const avatarsLength = avatars.length;
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -122,51 +119,69 @@ export function AvatarSidebar({
         )}
       </div>
 
-      {/* Menú de pestañas */}
-      <div className="bg-white/60 backdrop-blur-md border border-white/40 rounded-3xl p-2 flex flex-col gap-1 shadow-md shadow-slate-100/50">
-        <button
-          onClick={() => setActiveTab("identity")}
-          className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${activeTab === "identity" ? "bg-gradient-to-r from-rose-500/10 to-amber-500/10 border border-rose-100 text-rose-600 shadow-sm" : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"}`}
+      {/* Menú de pestañas / Rutas del Dashboard */}
+      <nav
+        role="navigation"
+        aria-label="Navegación del Dashboard"
+        className="bg-white/60 backdrop-blur-md border border-white/40 rounded-3xl p-2 flex flex-col gap-1 shadow-md shadow-slate-100/50"
+      >
+        <Link
+          href="/dashboard/identity"
+          aria-current={isActive("/dashboard/identity") ? "page" : undefined}
+          className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${isActive("/dashboard/identity") ? "bg-gradient-to-r from-rose-500/10 to-amber-500/10 border border-rose-100 text-rose-600 shadow-sm" : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"}`}
         >
           <User className="w-4 h-4 text-rose-500" />
           Identidad & DNA
-        </button>
-        <button
-          onClick={() => setActiveTab("setup")}
-          className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${activeTab === "setup" ? "bg-gradient-to-r from-rose-500/10 to-amber-500/10 border border-rose-100 text-rose-600 shadow-sm" : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"}`}
+        </Link>
+        <Link
+          href="/dashboard/setup"
+          aria-current={isActive("/dashboard/setup") ? "page" : undefined}
+          className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${isActive("/dashboard/setup") ? "bg-gradient-to-r from-rose-500/10 to-amber-500/10 border border-rose-100 text-rose-600 shadow-sm" : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"}`}
         >
           <Award className="w-4 h-4 text-rose-400" />
           Setup Viral Perfiles
-        </button>
-        <button
-          onClick={() => setActiveTab("planner")}
-          className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${activeTab === "planner" ? "bg-gradient-to-r from-rose-500/10 to-amber-500/10 border border-rose-100 text-rose-600 shadow-sm" : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"}`}
+        </Link>
+        <Link
+          href="/dashboard/planner"
+          aria-current={isActive("/dashboard/planner") ? "page" : undefined}
+          className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${isActive("/dashboard/planner") ? "bg-gradient-to-r from-rose-500/10 to-amber-500/10 border border-rose-100 text-rose-600 shadow-sm" : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"}`}
         >
           <Calendar className="w-4 h-4 text-amber-500" />
           Planificador Editorial
-        </button>
-        <button
-          onClick={() => setActiveTab("chat")}
-          className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${activeTab === "chat" ? "bg-gradient-to-r from-rose-500/10 to-amber-500/10 border border-rose-100 text-rose-600 shadow-sm" : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"}`}
+        </Link>
+        <Link
+          href="/dashboard/chat"
+          aria-current={isActive("/dashboard/chat") ? "page" : undefined}
+          className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${isActive("/dashboard/chat") ? "bg-gradient-to-r from-rose-500/10 to-amber-500/10 border border-rose-100 text-rose-600 shadow-sm" : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"}`}
         >
           <MessageCircle className="w-4 h-4 text-yellow-500" />
           Simulador de DMs
-        </button>
-        <button
-          onClick={() => setActiveTab("metrics")}
-          className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${activeTab === "metrics" ? "bg-gradient-to-r from-rose-500/10 to-amber-500/10 border border-rose-100 text-rose-600 shadow-sm" : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"}`}
+        </Link>
+        <Link
+          href="/dashboard/metrics"
+          aria-current={isActive("/dashboard/metrics") ? "page" : undefined}
+          className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${isActive("/dashboard/metrics") ? "bg-gradient-to-r from-rose-500/10 to-amber-500/10 border border-rose-100 text-rose-600 shadow-sm" : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"}`}
         >
           <DollarSign className="w-4 h-4 text-emerald-500" />
           Métricas de Crecimiento
-        </button>
-        <button
-          onClick={() => setActiveTab("showcase")}
-          className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${activeTab === "showcase" ? "bg-gradient-to-r from-rose-500/10 to-amber-500/10 border border-rose-100 text-rose-600 shadow-sm" : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"}`}
+        </Link>
+        <Link
+          href="/dashboard/showcase"
+          aria-current={isActive("/dashboard/showcase") ? "page" : undefined}
+          className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${isActive("/dashboard/showcase") ? "bg-gradient-to-r from-rose-500/10 to-amber-500/10 border border-rose-100 text-rose-600 shadow-sm" : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"}`}
         >
           <Sparkles className="w-4 h-4 text-purple-500" />
           Muestras de la Agencia
-        </button>
-      </div>
+        </Link>
+        <Link
+          href="/dashboard/admin"
+          aria-current={isActive("/dashboard/admin") ? "page" : undefined}
+          className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${isActive("/dashboard/admin") ? "bg-gradient-to-r from-rose-500/10 to-amber-500/10 border border-rose-100 text-rose-600 shadow-sm" : "text-slate-500 hover:text-slate-800 hover:bg-slate-50"}`}
+        >
+          <Shield className="w-4 h-4 text-indigo-500" />
+          Administración de Clientes
+        </Link>
+      </nav>
       
       {avatarsLength > 1 && (
         <div className="p-3 bg-rose-50/50 border border-rose-100 rounded-2xl text-center">
