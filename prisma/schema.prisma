@@ -21,7 +21,7 @@ model Avatar {
   characterDna        String
   audioSettings       String
   videoSettings       String
-  avatarImage         String?  // Guarda base64 o URL
+  avatarImage         String?  @db.Text // Guarda base64 o URL
   gender              String?  // Género
   bodyType            String?  // Silueta / Tipo de cuerpo
   instagramAccessToken String?

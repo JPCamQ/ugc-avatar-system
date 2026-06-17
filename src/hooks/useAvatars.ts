@@ -207,7 +207,8 @@ export function useAvatars({ showSuccess, showError }: UseAvatarsProps) {
               body: JSON.stringify({ avatarImage: compressedBase64 })
             });
             
-            if (!res.ok) throw new Error("Error en servidor");
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || "Error en el servidor");
 
             setAvatars((prevAvatars) => {
               const targetAvatar = prevAvatars.find(a => a.id === selectedAvatarId);
@@ -216,8 +217,8 @@ export function useAvatars({ showSuccess, showError }: UseAvatarsProps) {
               return prevAvatars.map(a => a.id === selectedAvatarId ? updatedAvatar : a);
             });
             showSuccess("Foto de avatar cargada con éxito.");
-          } catch {
-            showError("No se pudo guardar la imagen en la base de datos.");
+          } catch (err: any) {
+            showError(err.message || "No se pudo guardar la imagen en la base de datos.");
           }
         } else {
           showError("Error al procesar la imagen localmente.");
@@ -236,8 +237,8 @@ export function useAvatars({ showSuccess, showError }: UseAvatarsProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ avatarImage: null })
       });
-      
-      if (!res.ok) throw new Error("Error en servidor");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Error en el servidor");
 
       setAvatars((prevAvatars) => {
         const targetAvatar = prevAvatars.find(a => a.id === selectedAvatarId);
@@ -246,8 +247,8 @@ export function useAvatars({ showSuccess, showError }: UseAvatarsProps) {
         return prevAvatars.map(a => a.id === selectedAvatarId ? updatedAvatar : a);
       });
       showSuccess("Foto de avatar eliminada.");
-    } catch {
-      showError("No se pudo actualizar la imagen en la base de datos.");
+    } catch (err: any) {
+      showError(err.message || "No se pudo actualizar la imagen en la base de datos.");
     }
   }, [selectedAvatarId, showError, showSuccess]);
 
@@ -383,8 +384,8 @@ export function useAvatars({ showSuccess, showError }: UseAvatarsProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(editingAvatar)
       });
-
-      if (!res.ok) throw new Error("Fallo al actualizar el avatar en base de datos.");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Fallo al actualizar el avatar en base de datos.");
 
       setAvatars((prevAvatars) => {
         return prevAvatars.map(a => a.id === editingAvatar.id ? editingAvatar : a);

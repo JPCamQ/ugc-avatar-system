@@ -91,6 +91,32 @@ export async function callDeepSeek(
   throw new Error("Error desconocido al llamar a DeepSeek.");
 }
 
+function cleanJsonString(text: string): string {
+  if (!text) return "[]";
+  let cleaned = text.trim();
+  
+  // 1. Quitar bloques de código Markdown (```json o ```)
+  if (cleaned.startsWith("```")) {
+    cleaned = cleaned.replace(/^```(json)?\s*/i, "").replace(/```$/, "").trim();
+  }
+  
+  // 2. Extraer desde el primer corchete/llave hasta el último
+  const firstBracket = cleaned.match(/[\[\{]/);
+  if (firstBracket && firstBracket.index !== undefined) {
+    const startChar = firstBracket[0];
+    const endChar = startChar === "[" ? "]" : "}";
+    const lastBracketIndex = cleaned.lastIndexOf(endChar);
+    if (lastBracketIndex !== -1 && lastBracketIndex > firstBracket.index) {
+      cleaned = cleaned.substring(firstBracket.index, lastBracketIndex + 1);
+    }
+  }
+  
+  // 3. Remover caracteres de control no válidos
+  cleaned = cleaned.replace(/[\u0000-\u001F\u007F-\u009F]/g, "");
+  
+  return cleaned;
+}
+
 // 1. Generar ideas de publicaciones (Lifestyle & Storytelling Cosmopolita)
 export async function generatePostIdeas(
   avatar: AvatarIdentity,
@@ -105,7 +131,8 @@ export async function generatePostIdeas(
 
   try {
     const text = await callDeepSeek(apiKey, messages, true);
-    return JSON.parse(text || "[]");
+    const cleaned = cleanJsonString(text);
+    return JSON.parse(cleaned);
   } catch (error) {
     console.error("Error parsing post ideas from DeepSeek:", error);
     throw error;
@@ -290,14 +317,7 @@ export async function generateAgencyShowcase(
       throw new Error("La API de DeepSeek devolvió una respuesta vacía.");
     }
 
-    let cleanText = rawText.trim();
-    if (cleanText.startsWith("```")) {
-      cleanText = cleanText.replace(/^```json\s*/i, "").replace(/```$/, "").trim();
-    }
-
-    // Remover caracteres de control no válidos
-    cleanText = cleanText.replace(/[\u0000-\u001F\u007F-\u009F]/g, "");
-
+    const cleanText = cleanJsonString(rawText);
     const result = JSON.parse(cleanText);
 
     // Validar llaves del JSON
