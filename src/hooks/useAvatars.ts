@@ -166,35 +166,64 @@ export function useAvatars({ showSuccess, showError }: UseAvatarsProps) {
 
   // Subir foto de perfil
   const handlePhotoUpload = useCallback((file: File) => {
-    if (file.size > 2 * 1024 * 1024) {
-      showError("La imagen no debe superar los 2MB.");
+    // Permitir tamaños de entrada más altos y procesar localmente
+    if (file.size > 10 * 1024 * 1024) {
+      showError("La imagen no debe superar los 10MB.");
       return;
     }
 
     const reader = new FileReader();
-    reader.onloadend = async () => {
-      const base64String = reader.result as string;
+    reader.onloadend = () => {
+      const img = new Image();
+      img.onload = async () => {
+        const maxDim = 400;
+        let width = img.width;
+        let height = img.height;
 
-      try {
-        // Persistir en servidor
-        const res = await fetch(`/api/avatars/${selectedAvatarId}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ avatarImage: base64String })
-        });
-        
-        if (!res.ok) throw new Error("Error en servidor");
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
 
-        setAvatars((prevAvatars) => {
-          const targetAvatar = prevAvatars.find(a => a.id === selectedAvatarId);
-          if (!targetAvatar) return prevAvatars;
-          const updatedAvatar = { ...targetAvatar, avatarImage: base64String };
-          return prevAvatars.map(a => a.id === selectedAvatarId ? updatedAvatar : a);
-        });
-        showSuccess("Foto de avatar cargada con éxito.");
-      } catch {
-        showError("No se pudo guardar la imagen en la base de datos.");
-      }
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedBase64 = canvas.toDataURL("image/jpeg", 0.85);
+
+          try {
+            // Persistir en servidor
+            const res = await fetch(`/api/avatars/${selectedAvatarId}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ avatarImage: compressedBase64 })
+            });
+            
+            if (!res.ok) throw new Error("Error en servidor");
+
+            setAvatars((prevAvatars) => {
+              const targetAvatar = prevAvatars.find(a => a.id === selectedAvatarId);
+              if (!targetAvatar) return prevAvatars;
+              const updatedAvatar = { ...targetAvatar, avatarImage: compressedBase64 };
+              return prevAvatars.map(a => a.id === selectedAvatarId ? updatedAvatar : a);
+            });
+            showSuccess("Foto de avatar cargada con éxito.");
+          } catch {
+            showError("No se pudo guardar la imagen en la base de datos.");
+          }
+        } else {
+          showError("Error al procesar la imagen localmente.");
+        }
+      };
+      img.src = reader.result as string;
     };
     reader.readAsDataURL(file);
   }, [selectedAvatarId, showError, showSuccess]);

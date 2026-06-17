@@ -11,16 +11,44 @@ export function BioForm() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Límite de tamaño sugerido de 5MB
-    if (file.size > 5 * 1024 * 1024) {
-      alert("La imagen excede el tamaño máximo permitido (5MB)");
+    // Límite de entrada flexible para procesamiento
+    if (file.size > 10 * 1024 * 1024) {
+      alert("La imagen excede el tamaño máximo permitido (10MB)");
       return;
     }
 
     const reader = new FileReader();
     reader.onloadend = () => {
-      const base64String = reader.result as string;
-      updateCurrentAvatarField("avatarImage", base64String);
+      const img = new Image();
+      img.onload = () => {
+        const maxDim = 400;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxDim || height > maxDim) {
+          if (width > height) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedBase64 = canvas.toDataURL("image/jpeg", 0.85);
+          updateCurrentAvatarField("avatarImage", compressedBase64);
+        } else {
+          updateCurrentAvatarField("avatarImage", reader.result as string);
+        }
+      };
+      img.src = reader.result as string;
     };
     reader.readAsDataURL(file);
   };

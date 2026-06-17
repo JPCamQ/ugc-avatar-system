@@ -5,6 +5,22 @@ import { avatarIdentitySchema } from "@/lib/validations/avatar";
 // GET /api/avatars - Obtener todos los avatares
 export async function GET() {
   try {
+    // Migración en caliente: Asegurar que el avatar por defecto en la DB tenga la instrucción de consistencia visual ultra-estricta
+    const milena = await prisma.avatar.findUnique({
+      where: { id: "milena_reyes" },
+    });
+
+    const targetDnaInstruction = "Every facial feature, skin texture, freckles (if applicable), pores, eye color, lip shape, hair strands, and makeup must remain 1000% identical and consistent.";
+    if (milena && !milena.characterDna.includes(targetDnaInstruction)) {
+      const baseDna = milena.characterDna.split(" Use the provided image")[0].trim();
+      const updatedDna = `${baseDna} Use the provided image as an exact reference for identity and details. Every facial feature, skin texture, freckles (if applicable), pores, eye color, lip shape, hair strands, and makeup must remain 1000% identical and consistent. DO NOT alter their identity, proportions, skin tone, or level of realism. Generate a new, ultra-realistic image as if it were captured two seconds after this exact moment.`;
+      
+      await prisma.avatar.update({
+        where: { id: "milena_reyes" },
+        data: { characterDna: updatedDna },
+      });
+    }
+
     const avatars = await prisma.avatar.findMany({
       orderBy: { createdAt: "asc" },
     });
